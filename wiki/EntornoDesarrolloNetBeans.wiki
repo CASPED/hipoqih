@@ -1,5 +1,5 @@
 #summary Configuración de un entorno de desarrollo con NetBeans
-#labels Featured,Phase-Implementation
+#labels NetBeans,Carbide,S60
 
 = Software a Instalar =
 
