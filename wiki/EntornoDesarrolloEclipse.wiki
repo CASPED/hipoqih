@@ -1,12 +1,12 @@
 #summary Configuración del entorno de desarrollo con Eclipse para Nokia
-#labels Eclipse,SDK,Carbide.j
+#labels Eclipse,SDK,Carbide.j,Featured
 
 = Software necesario =
 
-* J2SE 5 o posterior
-* Eclipse v3.1 (no vale la 3.2)
-* Carbide.j v1.5
-* Opcionalmente, SDKs de Nokia para las versiones concretas de S60 
+  * J2SE 5 o posterior
+  * Eclipse v3.1 (no vale la 3.2)
+  * Carbide.j v1.5
+  * Opcionalmente, SDKs de Nokia para las versiones concretas de S60 
 
 = Proceso de instalación =
 
