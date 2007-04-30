@@ -1,0 +1,33 @@
+<?xml version='1.0'?>
+<root>
+     <command_handler name="hipoqih.CommandHandler"/>
+     <components>
+          <component name="hipoqih.hipoqih">
+               <type name="javax.microedition.midlet.MIDlet"/>
+               <location x="100" y="100"/>
+          </component>
+          <component name="hipoqih.hipoForm">
+               <type name="javax.microedition.lcdui.Form"/>
+               <location x="230" y="170"/>
+          </component>
+          <MIDletExit name="MIDletExit" id="r4vw47oc7botc===">
+               <location x="350" y="90"/>
+          </MIDletExit>
+     </components>
+     <connections>
+          <connection name="">
+               <source name="hipoqih.hipoqih"/>
+               <points>
+                    <point x="10.0" y="10.0"/>
+                    <point x="20.0" y="20.0"/>
+               </points>
+          </connection>
+          <connection name="command1">
+               <source name="hipoqih.hipoForm"/>
+               <points>
+                    <point x="10.0" y="10.0"/>
+                    <point x="20.0" y="20.0"/>
+               </points>
+          </connection>
+     </connections>
+</root>
