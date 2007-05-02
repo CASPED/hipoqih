@@ -23,8 +23,8 @@ public class hipoForm extends Form implements CommandListener
      private boolean conectado = false;
      static public final javax.microedition.lcdui.Command cmdExit = new Command("Salir", Command.EXIT, 0);
      javax.microedition.lcdui.Image image1;
-     javax.microedition.lcdui.Command cmdConfigurar = new Command("Configurar", Command.SCREEN, 1);
      javax.microedition.lcdui.Command cmdAcercaDe = new Command("Acerca de hipoqih", Command.SCREEN, 1);
+     static public final javax.microedition.lcdui.Command cmdConfigurar = new Command("Configurar", Command.SCREEN, 0);
 
      public hipoForm(String p1, Item[] p2)
      {
@@ -108,8 +108,9 @@ public class hipoForm extends Form implements CommandListener
           append(stringItem1);
           append(spacer2);
           append(strAviso);
-          addCommand(cmdConfigurar);
           addCommand(cmdAcercaDe);
+          this.addCommand(cmdConfigurar);
+          CommandHandler.getInstance().registerCommand(cmdConfigurar, "hipoqih.hipoConf");
      }
 
      public void commandAction(Command command, Displayable displayable)
