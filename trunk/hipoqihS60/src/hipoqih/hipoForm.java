@@ -21,8 +21,10 @@ public class hipoForm extends Form implements CommandListener
      javax.microedition.lcdui.Command cmdConectar = new Command("Conectar", Command.SCREEN, 1);
      javax.microedition.lcdui.Command cmdMapa = new Command("Mapa", Command.SCREEN, 1);
      private boolean conectado = false;
-     static public final javax.microedition.lcdui.Command command1 = new Command("Exit", Command.EXIT, 0);
+     static public final javax.microedition.lcdui.Command cmdExit = new Command("Salir", Command.EXIT, 0);
      javax.microedition.lcdui.Image image1;
+     javax.microedition.lcdui.Command cmdConfigurar = new Command("Configurar", Command.SCREEN, 1);
+     javax.microedition.lcdui.Command cmdAcercaDe = new Command("Acerca de hipoqih", Command.SCREEN, 1);
 
      public hipoForm(String p1, Item[] p2)
      {
@@ -95,8 +97,8 @@ public class hipoForm extends Form implements CommandListener
           addCommand(cmdRefresh);
           addCommand(cmdConectar);
           addCommand(cmdMapa);
-          this.addCommand(command1);
-          CommandHandler.getInstance().registerExitCommand(command1, "MIDletExit@r4vw47oc7botc===");
+          this.addCommand(cmdExit);
+          CommandHandler.getInstance().registerExitCommand(cmdExit, "MIDletExit@r4vw47oc7botc===");
           append(strComStatus);
           append(img);
           append(strLatitud);
@@ -106,6 +108,8 @@ public class hipoForm extends Form implements CommandListener
           append(stringItem1);
           append(spacer2);
           append(strAviso);
+          addCommand(cmdConfigurar);
+          addCommand(cmdAcercaDe);
      }
 
      public void commandAction(Command command, Displayable displayable)
