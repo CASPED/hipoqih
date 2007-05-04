@@ -1,7 +1,12 @@
 /* This file was created by Carbide.j */
 package hipoqih;
 
+import java.io.*;
 import javax.microedition.lcdui.*;
+import javax.microedition.io.*;
+
+import com.symbian.midp.io.CharConverter;
+
 import hipoqih.CommandHandler;
 
 public class hipoForm extends Form implements CommandListener
@@ -20,7 +25,7 @@ public class hipoForm extends Form implements CommandListener
      javax.microedition.lcdui.Command cmdRefresh = new Command("Refrescar Posición", Command.SCREEN, 0);
      javax.microedition.lcdui.Command cmdConectar = new Command("Conectar", Command.SCREEN, 1);
      javax.microedition.lcdui.Command cmdMapa = new Command("Mapa", Command.SCREEN, 1);
-     private boolean conectado = false;
+     private boolean isConnected = false;
      static public final javax.microedition.lcdui.Command cmdExit = new Command("Salir", Command.EXIT, 0);
      javax.microedition.lcdui.Image image1;
      javax.microedition.lcdui.Command cmdAcercaDe = new Command("Acerca de hipoqih", Command.SCREEN, 1);
@@ -119,18 +124,71 @@ public class hipoForm extends Form implements CommandListener
           {
                if ( command == cmdConectar )
                {
-                    if ( conectado )
+                    if ( isConnected )
                     {
                          strComStatus.setText("Parado");
                          img.setImage(imageOff);
                     }
                     else
                     {
+                         try
+                         {
+                              String mensaje = connect();
+                              strAviso.setText(mensaje);
+                         }
+                         catch (IOException ex)
+                         {
+                        	 strAviso.setText("error");
+                         }
                          strComStatus.setText("Conectado");
                          img.setImage(imageOn);
                     }
-                    conectado = !conectado;
+                    isConnected = !isConnected;
                }
           }
+     }
+
+     private String connect() throws IOException
+     {
+		String url = "http://www.hipoqih.com/alta.php?user=" + Configuracion.login + "&pass=" + Configuracion.
+		   password;
+		HttpConnection c = null;
+		InputStream is = null;
+		String mensaje;
+		int rc;
+		try
+          {
+           c = (HttpConnection)Connector.open(url);
+           // Obtener el código de respuesta abrirá la conexión,
+           // enviará la petición, y leerá las cabeceras de la respuesta HTTP.
+           // Las cabeceras se almacenan hasta que sean necesarias.
+           rc = c.getResponseCode();
+           if ( rc != HttpConnection.HTTP_OK )
+           {
+                throw new IOException("Error HTTP:" + rc);
+           }
+           is = c.openInputStream();
+           // Get the length and process the data
+			int actual = 0;
+			StringBuffer str = new StringBuffer();
+			mensaje = "antes del while";
+			while ((actual = is.read()) != -1)
+			{
+				str.append((char)actual);
+			}
+			mensaje = str.toString();
+          }
+          catch (ClassCastException e)
+          {
+               throw new IllegalArgumentException("Not an HTTP URL");
+          }
+          finally
+          {
+               if ( is != null )
+                    is.close();
+               if ( c != null )
+                    c.close();
+          }
+          return mensaje;
      }
 }
