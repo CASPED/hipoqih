@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry path="src" kind="src"/>
+	<classpathentry excluding="_svn/|hipoqih/_svn/" including="hipoqih/" path="src" kind="src"/>
 	<classpathentry path="C:/S60/devices/S60_3rd_MIDP_SDK_FP1_3/lib/hmidps60v31.jar" kind="lib"/>
 	<classpathentry path="bin" kind="output"/>
 </classpath>

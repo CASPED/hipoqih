@@ -33,6 +33,13 @@
                     <point x="20.0" y="20.0"/>
                </points>
           </connection>
+          <connection name="cmdSalir">
+               <source name="hipoqih.hipoConf"/>
+               <points>
+                    <point x="10.0" y="10.0"/>
+                    <point x="20.0" y="20.0"/>
+               </points>
+          </connection>
           <connection name="cmdConfigurar">
                <source name="hipoqih.hipoForm"/>
                <points>
