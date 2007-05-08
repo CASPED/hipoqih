@@ -2,13 +2,15 @@ package hipoqih;
 
 import javax.microedition.midlet.MIDlet;
 import hipoqih.CommandHandler;
-import hipoqih.hipoForm;
-import hipoqih.hipoConf;
+import hipoqih.HipoForm;
+import hipoqih.HipoConfForm;
+import hipoqih.HipoWaitForm;
 
-public class hipoqih extends MIDlet
+public class Hipoqih extends MIDlet
 {
-     hipoForm hipoForm = new hipoForm();
-     hipoConf hipoConf = new hipoConf();
+     HipoForm hipoForm = new HipoForm();
+     HipoConfForm hipoConf = new HipoConfForm();
+     HipoWaitForm hipoWait = new HipoWaitForm();
      public void startApp()
      {
           CommandHandler.getInstance().initialize(this);

@@ -1,15 +1,10 @@
 /* This file was created by Carbide.j */
 package hipoqih;
 
-import java.io.*;
 import javax.microedition.lcdui.*;
-import javax.microedition.io.*;
-
-import com.symbian.midp.io.CharConverter;
-
 import hipoqih.CommandHandler;
 
-public class hipoForm extends Form implements CommandListener
+public class HipoForm extends Form implements CommandListener
 {
      javax.microedition.lcdui.StringItem strComStatus = new StringItem("Parado", "", StringItem.PLAIN);
      javax.microedition.lcdui.ImageItem img = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT, "", ImageItem.PLAIN);
@@ -28,22 +23,22 @@ public class hipoForm extends Form implements CommandListener
      private boolean isConnected = false;
      static public final javax.microedition.lcdui.Command cmdExit = new Command("Salir", Command.EXIT, 0);
      javax.microedition.lcdui.Image image1;
-     javax.microedition.lcdui.Command cmdAcercaDe = new Command("Acerca de hipoqih", Command.SCREEN, 1);
+     javax.microedition.lcdui.Command cmdAcercaDe = new Command("Acerca de Hipoqih", Command.SCREEN, 1);
      static public final javax.microedition.lcdui.Command cmdConfigurar = new Command("Configurar", Command.SCREEN, 0);
 
-     public hipoForm(String p1, Item[] p2)
+     public HipoForm(String p1, Item[] p2)
      {
           super(p1, p2);
      }
 
 
-     public hipoForm(String p1)
+     public HipoForm(String p1)
      {
           super(p1);
      }
 
 
-     public hipoForm()
+     public HipoForm()
      {
           this("");
           try
@@ -57,8 +52,8 @@ public class hipoForm extends Form implements CommandListener
 
      void ndsInit() throws Exception
      {
-          imageOff = Image.createImage("/hipoqih/off.bmp");
-          imageOn = Image.createImage("/hipoqih/on.bmp");
+          imageOff = Image.createImage("/Hipoqih/off.bmp");
+          imageOn = Image.createImage("/Hipoqih/on.bmp");
           CommandHandler.getInstance().registerDisplayable(this);
           this.setCommandListener(this);
           strComStatus.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
@@ -115,7 +110,8 @@ public class hipoForm extends Form implements CommandListener
           append(strAviso);
           addCommand(cmdAcercaDe);
           this.addCommand(cmdConfigurar);
-          CommandHandler.getInstance().registerCommand(cmdConfigurar, "hipoqih.hipoConf");
+          CommandHandler.getInstance().registerCommand(cmdConfigurar, "Hipoqih.hipoConf");
+          setTitle("HipoForm");
      }
 
      public void commandAction(Command command, Displayable displayable)
@@ -133,12 +129,13 @@ public class hipoForm extends Form implements CommandListener
                     {
                          try
                          {
-                              String mensaje = connect();
+                              //String mensaje = connect();
+                              String mensaje = "test";
                               strAviso.setText(mensaje);
                          }
-                         catch (IOException ex)
+                         catch (Exception ex)
                          {
-                        	 strAviso.setText("error");
+                              strAviso.setText("error");
                          }
                          strComStatus.setText("Conectado");
                          img.setImage(imageOn);
@@ -146,49 +143,5 @@ public class hipoForm extends Form implements CommandListener
                     isConnected = !isConnected;
                }
           }
-     }
-
-     private String connect() throws IOException
-     {
-		String url = "http://www.hipoqih.com/alta.php?user=" + Configuracion.login + "&pass=" + Configuracion.
-		   password;
-		HttpConnection c = null;
-		InputStream is = null;
-		String mensaje;
-		int rc;
-		try
-          {
-           c = (HttpConnection)Connector.open(url);
-           // Obtener el código de respuesta abrirá la conexión,
-           // enviará la petición, y leerá las cabeceras de la respuesta HTTP.
-           // Las cabeceras se almacenan hasta que sean necesarias.
-           rc = c.getResponseCode();
-           if ( rc != HttpConnection.HTTP_OK )
-           {
-                throw new IOException("Error HTTP:" + rc);
-           }
-           is = c.openInputStream();
-           // Get the length and process the data
-			int actual = 0;
-			StringBuffer str = new StringBuffer();
-			mensaje = "antes del while";
-			while ((actual = is.read()) != -1)
-			{
-				str.append((char)actual);
-			}
-			mensaje = str.toString();
-          }
-          catch (ClassCastException e)
-          {
-               throw new IllegalArgumentException("Not an HTTP URL");
-          }
-          finally
-          {
-               if ( is != null )
-                    is.close();
-               if ( c != null )
-                    c.close();
-          }
-          return mensaje;
      }
 }
