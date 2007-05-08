@@ -4,25 +4,23 @@ package hipoqih;
 import javax.microedition.lcdui.*;
 import hipoqih.CommandHandler;
 
-public class hipoConf extends Form implements CommandListener
+public class HipoWaitForm extends Form implements CommandListener
 {
-     javax.microedition.lcdui.TextField txtLogin = new TextField("TextField", "", 50, TextField.ANY);
-     javax.microedition.lcdui.TextField txtClave = new TextField("TextField", "", 50, TextField.ANY);
-     static public final javax.microedition.lcdui.Command cmdSalir = new Command("Salir", Command.EXIT, 0);
+     javax.microedition.lcdui.Gauge gaugEsperar = new Gauge("Gauge", false, 100, 0);
 
-     public hipoConf(String p1, Item[] p2)
+     public HipoWaitForm(String p1, Item[] p2)
      {
           super(p1, p2);
      }
 
 
-     public hipoConf(String p1)
+     public HipoWaitForm(String p1)
      {
           super(p1);
      }
 
 
-     public hipoConf()
+     public HipoWaitForm()
      {
           this("");
           try
@@ -38,12 +36,10 @@ public class hipoConf extends Form implements CommandListener
      {
           CommandHandler.getInstance().registerDisplayable(this);
           this.setCommandListener(this);
-          append(txtLogin);
-          txtLogin.setLabel("Login");
-          append(txtClave);
-          txtClave.setLabel("Clave");
-          this.addCommand(cmdSalir);
-          CommandHandler.getInstance().registerCommand(cmdSalir, "hipoqih.hipoForm");
+          append(gaugEsperar);
+          gaugEsperar.setMaxValue(-1);
+          gaugEsperar.setLayout(Item.LAYOUT_CENTER | Item.LAYOUT_VCENTER | Item.LAYOUT_2);
+          gaugEsperar.setLabel("");
      }
 
      public void commandAction(Command command, Displayable displayable)

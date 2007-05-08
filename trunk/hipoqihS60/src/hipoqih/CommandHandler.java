@@ -50,7 +50,8 @@ public class CommandHandler {
 	}
 
 	public void start(Displayable startdisplay) {
-		display.setCurrent(startdisplay);
+		System.out.println("entramos en start");
+    	display.setCurrent(startdisplay);
 	}
 
 	public void registerDisplayable(Displayable displayable) {
