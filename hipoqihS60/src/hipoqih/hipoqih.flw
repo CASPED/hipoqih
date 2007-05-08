@@ -13,21 +13,10 @@
           <MIDletExit name="MIDletExit" id="r4vw47oc7botc===">
                <location x="350" y="90"/>
           </MIDletExit>
-          <component name="hipoqih.HipoConf">
-               <type name="javax.microedition.lcdui.Form"/>
-               <location x="230" y="310"/>
-          </component>
      </components>
      <connections>
           <connection name="">
                <source name="hipoqih.Hipoqih"/>
-               <points>
-                    <point x="10.0" y="10.0"/>
-                    <point x="20.0" y="20.0"/>
-               </points>
-          </connection>
-          <connection name="cmdExit">
-               <source name="hipoqih.HipoForm"/>
                <points>
                     <point x="10.0" y="10.0"/>
                     <point x="20.0" y="20.0"/>
