@@ -6,7 +6,7 @@ import hipoqih.CommandHandler;
 
 public class HipoForm extends Form implements CommandListener
 {
-     javax.microedition.lcdui.StringItem strComStatus = new StringItem("Parado", "", StringItem.PLAIN);
+     javax.microedition.lcdui.StringItem strComStatus = new StringItem("", "", StringItem.PLAIN);
      javax.microedition.lcdui.ImageItem img = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT, "", ImageItem.PLAIN);
      javax.microedition.lcdui.Image imageOn;
      javax.microedition.lcdui.Image imageOff;
@@ -22,14 +22,14 @@ public class HipoForm extends Form implements CommandListener
      javax.microedition.lcdui.StringItem strDatoDesde = new StringItem("", "", StringItem.PLAIN);
      javax.microedition.lcdui.StringItem strAviso = new StringItem("", "", StringItem.PLAIN);
      javax.microedition.lcdui.Spacer spacer2 = new Spacer(0, 0);
-     javax.microedition.lcdui.Command cmdRefresh = new Command("Refrescar Posición", Command.SCREEN, 0);
-     javax.microedition.lcdui.Command cmdConectar = new Command("Conectar", Command.SCREEN, 1);
-     javax.microedition.lcdui.Command cmdMapa = new Command("Mapa", Command.SCREEN, 1);
+     javax.microedition.lcdui.Command cmdRefresh = new Command("Refresh position", Command.SCREEN, 0);
+     javax.microedition.lcdui.Command cmdConectar = new Command("Connect", Command.SCREEN, 1);
+     javax.microedition.lcdui.Command cmdMapa = new Command("Map", Command.SCREEN, 1);
      private boolean isConnected = false;
-     static public final javax.microedition.lcdui.Command cmdExit = new Command("Salir", Command.EXIT, 0);
+     static public final javax.microedition.lcdui.Command cmdExit = new Command("Exit", Command.EXIT, 0);
      javax.microedition.lcdui.Image image1;
-     javax.microedition.lcdui.Command cmdAcercaDe = new Command("Acerca de Hipoqih", Command.SCREEN, 1);
-     static public final javax.microedition.lcdui.Command cmdConfigurar = new Command("Configurar", Command.SCREEN, 0);
+     javax.microedition.lcdui.Command cmdAcercaDe = new Command("About Hipoqih", Command.SCREEN, 1);
+     static public final javax.microedition.lcdui.Command cmdConfigurar = new Command("Properties", Command.SCREEN, 0);
      
      public HipoForm(String p1, Item[] p2)
      {
@@ -59,10 +59,10 @@ public class HipoForm extends Form implements CommandListener
      {
           CommandHandler.getInstance().registerDisplayable(this);
           this.setCommandListener(this);
-          setTitle("HipoForm");
+          setTitle("Hipoqih");
           strComStatus.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
           strComStatus.setLabel("");
-          strComStatus.setText("Parado");
+          strComStatus.setText("Disconnected");
           strComStatus.setLayout(Item.LAYOUT_2);
           strComStatus.setPreferredSize(-1, -1);
           append(strComStatus);
@@ -79,13 +79,13 @@ public class HipoForm extends Form implements CommandListener
           strLatitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
           strLatitud.setPreferredSize(80, -1);
           strLatitud.setLabel("");
-          strLatitud.setText("Latitud");
+          strLatitud.setText("Latitude");
           strLatitud.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
           append(strLatitud);
           strLongitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
           strLongitud.setPreferredSize(80, -1);
           strLongitud.setLabel("");
-          strLongitud.setText("Longitud");
+          strLongitud.setText("Longitude");
           strLongitud.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
           append(strLongitud);
           strDatoLatitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
@@ -103,13 +103,13 @@ public class HipoForm extends Form implements CommandListener
           spacer1.setPreferredSize(10, 10);
           spacer1.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
           append(spacer1);
-          strDeUsuario.setText("Ultimo aviso:  ");
+          strDeUsuario.setText("Last alert:  ");
           strDeUsuario.setLabel("");
           strDeUsuario.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
           strDeUsuario.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
           //strDeUsuario.setPreferredSize(80, -1);
           append(strDeUsuario);
-          strDatoDeUsuario.setText("Usuario");
+          strDatoDeUsuario.setText("User");
           strDatoDeUsuario.setLabel("");
           strDatoDeUsuario.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
           strDatoDeUsuario.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
@@ -117,13 +117,13 @@ public class HipoForm extends Form implements CommandListener
           append(strDatoDeUsuario);
           strDesde.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
           strDesde.setLabel("");
-          strDesde.setText("Desde:  ");
+          strDesde.setText("From:  ");
           strDesde.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
           //strDesde.setPreferredSize(80, -1);
           append(strDesde);
           strDatoDesde.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
           strDatoDesde.setLabel("");
-          strDatoDesde.setText("  x metros");
+          strDatoDesde.setText("  x meters");
           strDatoDesde.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
           //strDatoDesde.setPreferredSize(80, -1);
           append(strDatoDesde);
@@ -155,7 +155,7 @@ public class HipoForm extends Form implements CommandListener
               {
                    if ( isConnected )
                    {
-                        strComStatus.setText("Parado");
+                        strComStatus.setText("Disconnected");
                         img.setImage(imageOff);
                    }
                    else
@@ -169,7 +169,7 @@ public class HipoForm extends Form implements CommandListener
                         {
                              strAviso.setText("error");
                         }
-                        strComStatus.setText("Conectado");
+                        strComStatus.setText("Connected");
                         img.setImage(imageOn);
                    }
                    isConnected = !isConnected;
