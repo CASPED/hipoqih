@@ -11,6 +11,7 @@ public class HipoWeb
 		HttpConnection c = null;
 		InputStream is = null;
 		StringBuffer str = new StringBuffer(); // StringBuffer que almacenará la cadena de repuesta
+		String respuesta = "inicio";
 		
 		try
 		{
@@ -51,6 +52,25 @@ public class HipoWeb
 			if ( c != null )
 				c.close();
 		}
-		return str.toString();	
+
+		// El texto hasta el primer $$$ marca el tipo de mensaje
+		String mensaje = str.toString();
+		int posTipoMensaje = mensaje.indexOf("$$$");
+		if (posTipoMensaje == 0)
+			throw new IOException("Unexpected error: malformed response.");
+		
+		String tipoMensaje = mensaje.substring(0, posTipoMensaje);
+		
+		// Si el tipo es CODIGO, obtenemos el IdSeguro
+		if (tipoMensaje.equals("CODIGO"))
+		{
+			String idSeguro = mensaje.substring(posTipoMensaje + 3);
+			System.out.println("--" + idSeguro + "--");
+			idSeguro = idSeguro.substring(0, idSeguro.length() - 3);
+			System.out.println("--" + idSeguro + "--");
+			respuesta = idSeguro;
+		}
+		
+		return respuesta;	
 	}
 }
