@@ -162,8 +162,7 @@ public class HipoForm extends Form implements CommandListener
                    {
                         try
                         {
-                             //String mensaje = connect();
-                             String mensaje = "test";
+                             String mensaje = HipoWeb.conectar("http://www.hipoqih.com/alta.php?user=jcanvic&pass=aquelarre");
                              strAviso.setText(mensaje);
                         }
                         catch (Exception ex)
