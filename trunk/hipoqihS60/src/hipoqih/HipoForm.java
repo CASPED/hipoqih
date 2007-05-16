@@ -1,6 +1,7 @@
 /* This file was created by Carbide.j */
 package hipoqih;
 
+import java.util.*;
 import javax.microedition.lcdui.*;
 import hipoqih.CommandHandler;
 
@@ -30,6 +31,7 @@ public class HipoForm extends Form implements CommandListener
      javax.microedition.lcdui.Image image1;
      javax.microedition.lcdui.Command cmdAcercaDe = new Command("About Hipoqih", Command.SCREEN, 1);
      static public final javax.microedition.lcdui.Command cmdConfigurar = new Command("Properties", Command.SCREEN, 0);
+     Alert alertScreen;
      
      public HipoForm(String p1, Item[] p2)
      {
@@ -162,8 +164,46 @@ public class HipoForm extends Form implements CommandListener
                    {
                         try
                         {
-                             String mensaje = HipoWeb.conectar("http://www.hipoqih.com/alta.php?user=jcanvic&pass=aquelarre");
-                             strAviso.setText(mensaje);
+                             int resultado =  HipoWeb.conectar("http://www.hipoqih.com/alta.php?user=jcanvic&pass=aquelarre");
+                             System.out.println(resultado);
+                             switch(resultado)
+                             {
+                             case ResultadoWeb.BAD_RESPONSE:
+                                 System.out.println("BAD_RESPONSE");
+                             case ResultadoWeb.ERROR_AVISO:
+                                 System.out.println("ERROR_AVISO");
+                             case ResultadoWeb.ERROR_CODIGO:
+                                 System.out.println("ERROR_CODIGO");
+                             case ResultadoWeb.UNKNOWN_MESSAGE_TYPE:
+                            	 System.out.println("UNKNOWN_MESSAGE_TYPE");
+                            	 alertScreen = new Alert("Error");
+                            	 alertScreen.setString("There was an error accessing hipoqih");
+                            	 alertScreen.setTimeout(Alert.FOREVER);
+                            	 CommandHandler.getInstance().start(alertScreen);
+                            	 break;
+                             case 1:
+                            	 System.out.println("OK_AVISO");
+                            	 if (Aviso.EsPosicional)
+                            	 {
+                                     Date hoy = new Date();
+                                     String textoAviso = Comun.fechaToString(hoy.getTime()) + "\n" +
+                                     					Aviso.Login + " is at " + Aviso.Radio + " meters."; 
+                                     strAviso.setText(textoAviso);
+                            	 }
+                            	 else
+                            	 {
+                                     Date hoy = new Date();
+                                     String textoAviso = Comun.fechaToString(hoy.getTime()) + "\n" +
+                                     					Aviso.Texto;
+                                     strDatoDeUsuario.setText(Aviso.Login);
+                                     strDatoDesde.setText(Aviso.Radio +  " meters");
+                                     strAviso.setText(textoAviso);
+                            	 }
+                            	 break;
+                             case ResultadoWeb.OK_CODIGO:
+                                 System.out.println("OK_CODIGO");
+                            	 break;
+                             }
                         }
                         catch (Exception ex)
                         {
