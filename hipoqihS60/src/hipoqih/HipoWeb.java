@@ -6,14 +6,14 @@ import javax.microedition.io.*;
 
 public class HipoWeb
 {
-	public static String conectar(String url) throws IOException
+	public static int conectar(String url) throws IOException
 	{
 		HttpConnection c = null;
 		InputStream is = null;
 		StringBuffer str = new StringBuffer(); // StringBuffer que almacenará la cadena de repuesta
-		String respuesta = "inicio";
+		int resultado = ResultadoWeb.UNKNOWN_MESSAGE_TYPE;
 		
-		try
+		/*try
 		{
 			// Obtenemos la conexión con la dirección url indicada
 			c = (HttpConnection)Connector.open(url);
@@ -54,23 +54,70 @@ public class HipoWeb
 		}
 
 		// El texto hasta el primer $$$ marca el tipo de mensaje
-		String mensaje = str.toString();
-		int posTipoMensaje = mensaje.indexOf("$$$");
-		if (posTipoMensaje == 0)
-			throw new IOException("Unexpected error: malformed response.");
+		String mensaje = str.toString();*/
 		
-		String tipoMensaje = mensaje.substring(0, posTipoMensaje);
+		String mensaje = "AVISO$$$Esto es el aviso$$$http://$$$12.000000$$$32.000000$$$20$$$Pepito$$$N$$$";
+		
+		String[] mensajes = InterpretarMensaje(mensaje);
+
+		if (mensajes.length == 0)
+			return ResultadoWeb.BAD_RESPONSE;
+		
+		String tipoMensaje = mensajes[0];
 		
 		// Si el tipo es CODIGO, obtenemos el IdSeguro
 		if (tipoMensaje.equals("CODIGO"))
 		{
-			String idSeguro = mensaje.substring(posTipoMensaje + 3);
-			System.out.println("--" + idSeguro + "--");
-			idSeguro = idSeguro.substring(0, idSeguro.length() - 3);
-			System.out.println("--" + idSeguro + "--");
-			respuesta = idSeguro;
+			String idSeguro = mensajes[1];
+			
+			if (idSeguro.equals("ERROR"))
+			{
+				return ResultadoWeb.ERROR_CODIGO;
+			}
+			
+			resultado = ResultadoWeb.OK_CODIGO;
 		}
 		
-		return respuesta;	
+		if (tipoMensaje.equals("AVISO"))
+		{
+			if (mensajes.length != 8)
+			{
+				return ResultadoWeb.ERROR_AVISO;
+			}
+			
+			Aviso.Texto = mensajes[1];
+			Aviso.Url = mensajes[2];
+			Aviso.Latitud = mensajes[3];
+			Aviso.Longitud = mensajes[4];
+			Aviso.Radio = mensajes[5];
+			Aviso.Login = mensajes[6];
+			Aviso.EsPosicional = mensajes[7].equals("S");
+			
+			resultado = ResultadoWeb.OK_AVISO;
+		}
+
+		//return resultado;	
+		return ResultadoWeb.OK_AVISO;	
+	}
+	
+	private static String[] InterpretarMensaje(String mensaje)
+	{
+		// Temporalmente almacenaremos los mensajes en un vector 
+		// (ya que nos abemos el número de elementos)
+		java.util.Vector mensajes = new java.util.Vector();
+		
+		// Mientras haya un $$$ en la cadena
+		while (mensaje.indexOf("$$$") != -1)
+		{
+			// Añadimos lo que hay hasta el $$$ al vector
+			mensajes.addElement(mensaje.substring(0, mensaje.indexOf("$$$")));
+			// Eliminamos lo ya añadido (incluído el $$$)
+			mensaje = mensaje.substring(mensaje.indexOf("$$$") + 3);
+		}
+		
+		// Copiamos el vector a un array de Strings
+		String[] respuesta = new String[mensajes.size()];
+		mensajes.copyInto(respuesta);
+		return respuesta;
 	}
 }
