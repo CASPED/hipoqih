@@ -1,6 +1,7 @@
 /* This file was created by Carbide.j */
 package hipoqih;
 	
+import java.io.IOException;
 import java.util.*;
 import javax.microedition.lcdui.*;
 import hipoqih.CommandHandler;
@@ -136,7 +137,7 @@ public class HipoForm extends Form implements CommandListener
 		append(spacer2);
 		strAviso.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		strAviso.setLabel("");
-		strAviso.setText("A");
+		strAviso.setText("Este es el mensaje del aviso.");
 		strAviso.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_ITALIC, Font.SIZE_SMALL));
 		strAviso.setPreferredSize(-1, -1);
 		append(strAviso);
@@ -148,16 +149,13 @@ public class HipoForm extends Form implements CommandListener
 		CommandHandler.getInstance().registerExitCommand(cmdExit, "MIDletExit@r4vw47oc7botc===");
 		addCommand(cmdConfigurar);
 		CommandHandler.getInstance().registerCommand(cmdConfigurar, "Hipoqih.HipoConfForm");
-		System.out.println("antes del timer");
     	try
     	{
     		timer.schedule(tempo, 1000, 1000);
     	}
     	catch(Exception ex)
     	{
-    		System.out.println(ex.getMessage());
     	}
-		System.out.println("después del timer");
     }
 
      public void commandAction(Command command, Displayable displayable)
@@ -175,7 +173,7 @@ public class HipoForm extends Form implements CommandListener
                    {
                         try
                         {
-                             int resultado =  HipoWeb.conectar("http://www.hipoqih.com/alta.php?user=jcanvic&pass=aquelarre");
+                             int resultado =  HipoWeb.llamarAltaWeb(Configuracion.user, Configuracion.password);
                              System.out.println(resultado);
                              switch(resultado)
                              {
@@ -216,7 +214,7 @@ public class HipoForm extends Form implements CommandListener
                             	 break;
                              }
                         }
-                        catch (Exception ex)
+                        catch (IOException ex)
                         {
                              strAviso.setText("error");
                         }
@@ -238,6 +236,16 @@ public class HipoForm extends Form implements CommandListener
      
      private void EnviaPosicion()
      {
-    	System.out.println("AA");
+    	if (!isConnected)
+    	{
+    		try
+    		{
+    			HipoWeb.llamarAltaWeb(Configuracion.user, Configuracion.password);
+    		}
+    		catch(IOException ex)
+    		{
+    			
+    		}
+    	}
      }
-}
+} 
