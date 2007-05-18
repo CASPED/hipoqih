@@ -10,3 +10,4 @@ public class Aviso
 	public static String Login = "";
 	public static boolean EsPosicional = false;
 }
+   

@@ -24,4 +24,4 @@ public class Hipoqih extends MIDlet
      public void pauseApp()
      {
      }
-}
+} 
