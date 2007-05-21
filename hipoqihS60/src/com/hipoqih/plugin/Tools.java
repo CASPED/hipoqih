@@ -1,9 +1,8 @@
-package hipoqih;
+package com.hipoqih.plugin;
 
 import java.util.*;
 
-public class Comun
-{
+public class Tools {
 	public static String fechaToString (long date)
 	{
 		Calendar c = Calendar.getInstance();
@@ -26,4 +25,3 @@ public class Comun
 		return t;
 	}
 }
-
