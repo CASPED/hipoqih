@@ -1,69 +1,70 @@
-package hipoqih;
-  
+package com.hipoqih.plugin.Web;
+
 import java.io.*;
 import java.io.IOException;
 import javax.microedition.io.*;
+import com.hipoqih.plugin.*;
 
 public class HipoWeb
 {
-	public static int llamarAltaWeb(String user, String pass) throws IOException
+	public static int sendWebReg(String user, String pass) throws IOException
 	{
 		
 		
 		
-		int resultado = ResultadoWeb.UNKNOWN_MESSAGE_TYPE;
+		int result = WebResult.UNKNOWN_MESSAGE_TYPE;
 		
 		/*
 
 		// El texto hasta el primer $$$ marca el tipo de mensaje
 		String url = "http://www.hipoqih.com/alta.php?user="+user+"&pass="+pass;
-		String mensaje = hacerLlamadaWeb(url);*/
+		String mensaje = sendWebRequest(url);*/
 		
-		String mensaje = "AVISO$$$Esto es el aviso$$$http://$$$12.000000$$$32.000000$$$20$$$Pepito$$$N$$$";
+		String message = "AVISO$$$Esto es el aviso$$$http://$$$12.000000$$$32.000000$$$20$$$Pepito$$$N$$$";
 		
-		String[] mensajes = InterpretarMensaje(mensaje);
+		String[] messages = parseMessage(message);
 
-		if (mensajes.length == 0)
-			return ResultadoWeb.BAD_RESPONSE;
+		if (messages.length == 0)
+			return WebResult.BAD_RESPONSE;
 		
-		String tipoMensaje = mensajes[0];
+		String messageType = messages[0];
 		
 		// Si el tipo es CODIGO, obtenemos el IdSeguro
-		if (tipoMensaje.equals("CODIGO"))
+		if (messageType.equals("CODIGO"))
 		{
-			String idSeguro = mensajes[1];
+			String secureID = messages[1];
 			
-			if (idSeguro.equals("ERROR"))
+			if (secureID.equals("ERROR"))
 			{
-				return ResultadoWeb.ERROR_CODIGO;
+				return WebResult.ERROR_CODIGO;
 			}
-			
-			resultado = ResultadoWeb.OK_CODIGO;
+			State.connected = true;
+			result = WebResult.OK_CODIGO;
 		}
 		
-		if (tipoMensaje.equals("AVISO"))
+		if (messageType.equals("AVISO"))
 		{
-			if (mensajes.length != 8)
+			if (messages.length != 8)
 			{
-				return ResultadoWeb.ERROR_AVISO;
+				return WebResult.ERROR_AVISO;
 			}
 			
-			Aviso.Texto = mensajes[1];
-			Aviso.Url = mensajes[2];
-			Aviso.Latitud = mensajes[3];
-			Aviso.Longitud = mensajes[4];
-			Aviso.Radio = mensajes[5];
-			Aviso.Login = mensajes[6];
-			Aviso.EsPosicional = mensajes[7].equals("S");
+			HipoAlert.Text = messages[1];
+			HipoAlert.Url = messages[2];
+			HipoAlert.Latitude = messages[3];
+			HipoAlert.Longitude = messages[4];
+			HipoAlert.Distance = messages[5];
+			HipoAlert.Login = messages[6];
+			HipoAlert.IsPositional = messages[7].equals("S");
 			
-			resultado = ResultadoWeb.OK_AVISO;
+			result = WebResult.OK_AVISO;
 		}
 
 		//return resultado;	
-		return ResultadoWeb.OK_AVISO;	
+		return WebResult.OK_AVISO;	
 	}
 	
-	private static String hacerLlamadaWeb(String url) throws IOException
+	private static String sendWebRequest(String url) throws IOException
 	{
 		HttpConnection c = null;
 		InputStream is = null;
@@ -112,7 +113,7 @@ public class HipoWeb
 		return str.toString();
 	}
 	
-	private static String[] InterpretarMensaje(String mensaje)
+	private static String[] parseMessage(String mensaje)
 	{
 		// Temporalmente almacenaremos los mensajes en un vector 
 		// (ya que nos abemos el número de elementos)

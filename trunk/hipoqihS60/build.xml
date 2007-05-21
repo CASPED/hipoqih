@@ -1,5 +1,5 @@
 <?xml version="1.0"?> 
-<project name="hipoqih" default="run_with_jad"> 
+<project name="hipoqihS60" default="run_with_jad"> 
 	<description> 
 		A template Ant build file for Carbide.j. 
 		For more information about Ant build files go to http://ant.apache.org/. 
@@ -21,11 +21,11 @@
 		The declaration may be empty if default package 
 		used, and thus not containing dots at all. 
 		The declaration is used in target 'package'. -->
-	<property name="package.dir.dot" value="hipoqih." /> 
+	<property name="package.dir.dot" value="example.application." /> 
 
 	<!-- The user should REPLACE THE FOLLOWING APPLICATION declaration.
 		The declaration should *not* contain package name -->
-	<property name="application" value="hipoqih" /> 
+	<property name="application" value="MyMIDlet" /> 
 
 	<echo message="User definable application declaration is: '${application}'."/>
 	<property name="application.jar" value="${release.dir}/${application}.jar" /> 
@@ -35,13 +35,13 @@
 		package declaration to use auto-packaging provided by the emulator. 
 		The declaration may be empty if default package used. 
 		The declaration is used in target 'run_with_class'. -->
-	<property name="package.dir.slash" value="hipoqih/" /> 
+	<property name="package.dir.slash" value="example/application/" /> 
 
 	<!-- Set emulator to use with Carbide.j Ant tasks --> 
-	<property name="ndsj2me.emulator" value="S60 3rd Edition FP1 SDK for MIDP" /> 
+	<property name="ndsj2me.emulator" value="S60 2nd FP3 MIDP SDK" /> 
 	<!-- The line below is not necessary, but it 
 		explicitly chooses the device to use. --> 
-	<property name="ndsj2me.device" value="S60 3rd Edition FP1 SDK for MIDP" /> 
+	<property name="ndsj2me.device" value="S60_2nd_FP3_MIDP_SDK" /> 
 	<echo message="User definable device declaration is: '${ndsj2me.device}'."/>
 
 	<!-- Declare Carbide.j Ant tasks --> 
@@ -151,10 +151,7 @@
 	    - - - - - - - - - - - - - - - - - --> 
 	<target name="run_all_emulators_with_jad" depends="package"> 
 		<antcall target="internal_run"> 
-			<param name="device" value="S60Emulator" /> 
-		</antcall> 
-		<antcall target="internal_run"> 
-			<param name="device" value="S60Device" /> 
+			<param name="device" value="S60_2nd_FP3_MIDP_SDK" /> 
 		</antcall> 
 	</target> 
  

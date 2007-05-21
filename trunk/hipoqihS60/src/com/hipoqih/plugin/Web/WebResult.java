@@ -1,6 +1,6 @@
-package hipoqih;
+package com.hipoqih.plugin.Web;
 
-public class ResultadoWeb
+public class WebResult
 {
 	public static final int OK_CODIGO = 0;
 	public static final int OK_AVISO = 1;
