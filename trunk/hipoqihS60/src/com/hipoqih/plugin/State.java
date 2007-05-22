@@ -1,12 +1,12 @@
 package com.hipoqih.plugin;
 
-import com.hipoqih.plugin.gps.GPS;
+//import com.hipoqih.plugin.gps.GPS;
 
 public class State 
 {
 	public static String user = "jcanvic";
 	public static String password = "aquelarre";
-	public static GPS gps = null;
+//	public static GPS gps = null;
 	public static boolean connected = false;
 	public static String positionSource = "CONFIG";
 	public static String latitude = "";
