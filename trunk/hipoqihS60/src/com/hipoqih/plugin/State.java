@@ -1,12 +1,15 @@
 package com.hipoqih.plugin;
+ 
+import java.util.Hashtable;
 
+import javax.microedition.rms.RecordStore;
+ 
 //import com.hipoqih.plugin.gps.GPS;
 
 public class State 
 {
 	public static String user = "jcanvic";
 	public static String password = "aquelarre";
-//	public static GPS gps = null;
 	public static boolean connected = false;
 	public static String positionSource = "CONFIG";
 	public static String latitude = "";
@@ -20,4 +23,6 @@ public class State
 	public static int alertHeight = 0;
 	public static int alertTop = 0;
 	public static int alertLeft = 0;
+	public static RecordStore recordStore;
+	public static Hashtable recordMaps = new Hashtable();
 }

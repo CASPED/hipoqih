@@ -3,7 +3,7 @@ package com.hipoqih.plugin.task;
 import java.util.*;
 import java.io.*;
 import javax.microedition.lcdui.*;
-
+ 
 public abstract class BackgroundTask extends TimerTask {
 
   private Thread th;
@@ -32,7 +32,6 @@ public abstract class BackgroundTask extends TimerTask {
 
   public void go () {
     stopped = false;
-	System.out.println(Thread.currentThread().toString() + ": " + "Antes del th.start");
     th.start();
   }
 
@@ -56,7 +55,6 @@ public abstract class BackgroundTask extends TimerTask {
 			alertScreen.setString( "Please check your network or server setup" );
 			alertScreen.setTimeout(Alert.FOREVER);
 			nextScreen = prevScreen;
-			System.out.println("Background task IO Error");
 			ioe.printStackTrace();
 		} 
 		catch (Exception e) 

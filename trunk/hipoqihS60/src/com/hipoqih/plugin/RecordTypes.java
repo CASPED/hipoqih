@@ -1,5 +1,5 @@
 package com.hipoqih.plugin;
-
+ 
 public class RecordTypes 
 {
 	public static final int USER = 1;

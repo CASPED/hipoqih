@@ -1,5 +1,5 @@
 package com.hipoqih.plugin;
-
+ 
 public class HipoAlert
 {
 	public static String Text = "";

@@ -18,10 +18,8 @@ public class Start extends MIDlet implements CommandListener
 		MVCComponent.display = display;
 		exitCommand = new Command("EXIT", Command.SCREEN, 2);
 		goCommand = new Command("GO", Command.SCREEN, 1);
-		State.user = getAppProperty("User");
-		State.password = getAppProperty("Password");
 	}
-
+ 
 	public void startApp() 
 	{
 		try 
@@ -53,6 +51,14 @@ public class Start extends MIDlet implements CommandListener
 	 
 	public void destroyApp(boolean unconditional) 
 	{
+		try
+		{
+			State.recordStore.closeRecordStore();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public void commandAction(Command command, Displayable screen) 
@@ -74,27 +80,26 @@ public class Start extends MIDlet implements CommandListener
 	private void loadConfiguration() throws Exception
 	{
 		System.out.println("Entrando en loadConfiguration");
-		RecordStore recordStore = RecordStore.openRecordStore("hipoqih", true);
+		State.recordStore = RecordStore.openRecordStore("hipoqih", true);
 		
-		if (recordStore.getNumRecords() == 0)
+		if (State.recordStore.getNumRecords() == 0)
 		{
-			createConfiguration(recordStore);
+			createConfiguration(State.recordStore);
 		}
 		// Enumerate records without filter nor order
-		RecordEnumeration re = recordStore.enumerateRecords(null, null, false);
+		RecordEnumeration re = State.recordStore.enumerateRecords(null, null, false);
 		while(re.hasNextElement())
 		{
+			int id = re.nextRecordId();
 			byte[] record = re.nextRecord();
-			int id = record[0];
-			processRecord(record, id);
+			int typeId = record[0];
+			processRecord(record, typeId);
+			State.recordMaps.put(new Integer(typeId), new Integer(id));
 		}
-		recordStore.closeRecordStore();
 	}
 	
 	private void processRecord(byte[] record, int typeId)
 	{
-		System.out.println("Entrando en processRecord");
-
 		// Each record type has a different id
 		switch(typeId)
 		{
@@ -110,12 +115,48 @@ public class Start extends MIDlet implements CommandListener
 		case RecordTypes.ALERTWIDTH:
 			State.alertWidth = bytesToInteger(record);
 			break;
+		case RecordTypes.AUTOALERT:
+			State.autoAlert = bytesToBoolean(record);
+			break;
+		case RecordTypes.LATITUDE:
+			State.latitude = new String(record, 1, record.length - 1);
+			break;
+		case RecordTypes.LONGITUDE:
+			State.longitude = new String(record, 1, record.length - 1);
+			break;
+		case RecordTypes.MAPALERT:
+			State.mapAlert = bytesToBoolean(record);
+			break;
+		case RecordTypes.MINUTES:
+			State.minutes = new String(record, 1, record.length - 1);
+			break;
+		case RecordTypes.PASSWORD:
+			State.password = new String(record, 1, record.length - 1);
+			break;
+		case RecordTypes.POSITIONSOURCE:
+			State.positionSource = new String(record, 1, record.length - 1);
+			break;
+		case RecordTypes.SECONDS:
+			State.seconds = new String(record, 1, record.length - 1);
+			break;
+		case RecordTypes.URLMAPALERT:
+			State.urlMapAlert = bytesToBoolean(record);
+			break;
+		case RecordTypes.USER:
+			State.user = new String(record, 1, record.length - 1);
+			break;
 		}
+	}
+	
+	private boolean bytesToBoolean(byte[] record)
+	{
+		String s = new String(record, 1, record.length - 1);
+		return s.equals("1");
 	}
 	
 	private int bytesToInteger(byte[] record)
 	{
-		int result;
+		int result = 0;
 		String s = new String(record, 1, record.length - 1);
 		try
 		{
@@ -125,14 +166,12 @@ public class Start extends MIDlet implements CommandListener
 		{
 			System.out.println(nfe.getMessage());
 			nfe.printStackTrace();
-			result = 0;
 		}
 		return result;
 	}
 	
 	private void createConfiguration(RecordStore recordStore)
 	{
-		System.out.println("Entrando en createConfiguration");
 		createRecord(recordStore, Integer.toString(State.alertHeight), RecordTypes.ALERTHEIGHT);
 		createRecord(recordStore, Integer.toString(State.alertLeft), RecordTypes.ALERTLEFT);
 		createRecord(recordStore, Integer.toString(State.alertTop), RecordTypes.ALERTTOP);
@@ -141,31 +180,32 @@ public class Start extends MIDlet implements CommandListener
 		createRecord(recordStore, autoAlert, RecordTypes.AUTOALERT);
 		createRecord(recordStore, State.latitude, RecordTypes.LATITUDE);
 		createRecord(recordStore, State.longitude, RecordTypes.LONGITUDE);
+		String mapAlert = State.mapAlert ? "1" : "0";
+		createRecord(recordStore, mapAlert, RecordTypes.MAPALERT);
 		createRecord(recordStore, State.minutes, RecordTypes.MINUTES);
 		createRecord(recordStore, State.password, RecordTypes.PASSWORD);
 		createRecord(recordStore, State.positionSource, RecordTypes.POSITIONSOURCE);
 		createRecord(recordStore, State.seconds, RecordTypes.SECONDS);
+		String urlMapAlert = State.urlMapAlert ? "1" : "0";
+		createRecord(recordStore, urlMapAlert, RecordTypes.URLMAPALERT);
 		createRecord(recordStore, State.user, RecordTypes.USER);
 	}
 	
 	private void createRecord(RecordStore recordStore, String data, int recordType)
 	{
-		System.out.println("Entrando en createRecord: " + data + Integer.toString(recordType));
 		int recordLength = 1;
 		byte[] dataBytes = data.getBytes();
 		
 		if (data.length() > 0)
 			recordLength = dataBytes.length + 1;
 		
-		System.out.println("longitud datos: " +Integer.toString(recordLength));
 		byte[] record = new byte[recordLength]; 
 		record[0] = (byte)recordType;
 		for(int i = 1; i < recordLength; i++)
 			record[i] = dataBytes[i-1];
 		try
 		{
-			int id = recordStore.addRecord(record, 0, recordLength);
-			System.out.println(Integer.toString(id));
+			recordStore.addRecord(record, 0, recordLength);
 		}
 		catch(RecordStoreException rse)
 		{

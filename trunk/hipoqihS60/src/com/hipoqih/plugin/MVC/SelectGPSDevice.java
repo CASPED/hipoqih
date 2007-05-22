@@ -1,7 +1,7 @@
 package com.hipoqih.plugin.MVC;
 
 import javax.microedition.lcdui.*;
-
+ 
 //import com.hipoqih.plugin.gps.*;
 
 public class SelectGPSDevice extends MVCComponent  

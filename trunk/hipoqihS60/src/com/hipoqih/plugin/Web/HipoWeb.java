@@ -1,27 +1,23 @@
 package com.hipoqih.plugin.Web;
 
-import java.io.*;
+//import java.io.*;
 import java.io.IOException;
-import javax.microedition.io.*;
+//import javax.microedition.io.*;
 import com.hipoqih.plugin.*;
 
 public class HipoWeb
 {
 	public static int sendWebReg(String user, String pass) throws IOException
 	{
-		
-		
-		
-		int result = WebResult.UNKNOWN_MESSAGE_TYPE;
-		
+		//
 		/*
-
+		int result;
 		// El texto hasta el primer $$$ marca el tipo de mensaje
 		String url = "http://www.hipoqih.com/alta.php?user="+user+"&pass="+pass;
 		String mensaje = sendWebRequest(url);*/
 		
 		String message = "AVISO$$$Esto es el aviso$$$http://$$$12.000000$$$32.000000$$$20$$$Pepito$$$N$$$";
-		
+	 	
 		String[] messages = parseMessage(message);
 
 		if (messages.length == 0)
@@ -39,7 +35,7 @@ public class HipoWeb
 				return WebResult.ERROR_CODIGO;
 			}
 			State.connected = true;
-			result = WebResult.OK_CODIGO;
+			//result = WebResult.OK_CODIGO;
 		}
 		
 		if (messageType.equals("AVISO"))
@@ -57,14 +53,14 @@ public class HipoWeb
 			HipoAlert.Login = messages[6];
 			HipoAlert.IsPositional = messages[7].equals("S");
 			
-			result = WebResult.OK_AVISO;
+			//result = WebResult.OK_AVISO;
 		}
 
 		//return resultado;	
 		return WebResult.OK_AVISO;	
 	}
 	
-	private static String sendWebRequest(String url) throws IOException
+/*	private static String sendWebRequest(String url) throws IOException
 	{
 		HttpConnection c = null;
 		InputStream is = null;
@@ -111,7 +107,7 @@ public class HipoWeb
 		}
 		
 		return str.toString();
-	}
+	}*/
 	
 	private static String[] parseMessage(String mensaje)
 	{

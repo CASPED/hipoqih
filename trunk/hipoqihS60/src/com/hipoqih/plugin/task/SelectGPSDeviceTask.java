@@ -3,7 +3,7 @@ package com.hipoqih.plugin.task;
 import javax.microedition.lcdui.*;
 import com.hipoqih.plugin.MVC.*;
 //import com.hipoqih.plugin.gps.*;
-
+ 
 public class SelectGPSDeviceTask extends BackgroundTask 
 {
 //	private BluetoothConnection bt = new BluetoothConnection();
