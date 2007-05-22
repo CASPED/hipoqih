@@ -8,7 +8,7 @@ import javax.microedition.rms.RecordStore;
 
 import com.hipoqih.plugin.Web.*;
 import com.hipoqih.plugin.*;
-import com.hipoqih.plugin.gps.*;
+//import com.hipoqih.plugin.gps.*;
 import com.hipoqih.plugin.task.SelectGPSDeviceTask;
 
 public class MainForm extends MVCComponent 
@@ -51,11 +51,11 @@ public class MainForm extends MVCComponent
 		return screen;
 	}
 	
-	public static void setGPS(GPS g)
+/*	public static void setGPS(GPS g)
 	{
 		System.out.println(Thread.currentThread().toString() + ": " + "setGPS");
 		State.gps = g;
-	}
+	}*/
 	
 	protected void createView() throws Exception 
 	{
@@ -163,7 +163,7 @@ public class MainForm extends MVCComponent
 		}
 		else if (command == cmdRefresh)
 		{
-			if (State.gps == null)
+/*			if (State.gps == null)
 			{
 				try
 				{
@@ -180,7 +180,7 @@ public class MainForm extends MVCComponent
 			else
 			{
 				strAviso.setText(State.gps.getNMEAMessage());
-			}
+			}*/
 		}
 		else if (command == cmdMapa)
 		{
@@ -198,9 +198,7 @@ public class MainForm extends MVCComponent
 				System.out.println(ex.getMessage());
 				ex.printStackTrace();
 			}
-			
 		}
-		
     }
 	
 	protected void updateView() throws Exception 
