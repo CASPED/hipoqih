@@ -4,13 +4,13 @@ import java.io.*;
 import java.util.*;
 
 import javax.microedition.lcdui.*;
-import javax.microedition.rms.RecordStore;
+import javax.microedition.rms.*;
 
 import com.hipoqih.plugin.Web.*;
 import com.hipoqih.plugin.*;
 //import com.hipoqih.plugin.gps.*;
-import com.hipoqih.plugin.task.SelectGPSDeviceTask;
-
+//import com.hipoqih.plugin.task.SelectGPSDeviceTask;
+ 
 public class MainForm extends MVCComponent 
 {
 	public static Start m;
@@ -137,11 +137,12 @@ public class MainForm extends MVCComponent
 		screen.addCommand(cmdMapa);
 		screen.addCommand(cmdAcercaDe);
 		screen.addCommand(cmdExit);		
-		timer.schedule(tempo, 1000, 1000);
+		//timer.schedule(tempo, 1000, 1000);
 	}
 
 	public void commandAction(Command command, Displayable displayable)
     {
+		
 		// EXIT command
 		if (command == cmdExit)
 		{
@@ -184,20 +185,33 @@ public class MainForm extends MVCComponent
 		}
 		else if (command == cmdMapa)
 		{
-			String ah = "7";
-			byte[] alert = ah.getBytes();
-			System.out.println("Antes de escribir: " + ah);
-			try
-			{
-				RecordStore recordStore = RecordStore.openRecordStore("hipoqih", true);
-				recordStore.setRecord(RecordTypes.ALERTHEIGHT, alert, 0, alert.length);
-				recordStore.closeRecordStore();
+/*			try
+			{*/
+				int ah = 5;
+				boolean b = true;
+				
+				for (Enumeration e = State.recordMaps.elements(); e.hasMoreElements(); )
+				{
+					System.out.println(e.nextElement());
+				}
+				
+				/*Tools.updateRecord(RecordTypes.USER, "Pepe");
+				System.out.println("Después de la primera llamada:" + Integer.toString(ah));
+				Tools.updateRecord(RecordTypes.ALERTHEIGHT, Integer.toString(ah));
+				System.out.println("Después de la segunda llamada");
+				Tools.updateRecord(RecordTypes.MAPALERT, (b ? "1" : "0"));
+				System.out.println("Después de la tercera llamada");
+				String s = Tools.retrieveRecord(RecordTypes.USER);
+				System.out.println("User: " + s);
+				ah = Integer.parseInt(Tools.retrieveRecord(RecordTypes.ALERTHEIGHT));
+				System.out.println("AlertHeight: " + Integer.toString(ah));
+				System.out.println("MapAlert: " + Tools.retrieveRecord(RecordTypes.MAPALERT));
 			}
-			catch(Exception ex)
+			catch(RecordStoreException rse)
 			{
-				System.out.println(ex.getMessage());
-				ex.printStackTrace();
-			}
+				System.out.println(rse.getMessage());
+				rse.printStackTrace();
+			}*/
 		}
     }
 	

@@ -1,7 +1,7 @@
 package com.hipoqih.plugin.task;
 
 import javax.microedition.lcdui.*;
-
+ 
 public class ProgressGauge extends Form implements Runnable, CommandListener {
 
   private boolean stopped; // whether this is stopped
