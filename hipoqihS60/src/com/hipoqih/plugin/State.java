@@ -25,4 +25,5 @@ public class State
 	public static int alertLeft = 0;
 	public static RecordStore recordStore;
 	public static Hashtable recordMaps = new Hashtable();
+	public static int zoom = 10000;
 }
