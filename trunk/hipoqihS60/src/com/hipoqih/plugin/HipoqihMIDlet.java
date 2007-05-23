@@ -1,23 +1,32 @@
 package com.hipoqih.plugin;
 
+
+
 import javax.microedition.midlet.*;
 import javax.microedition.rms.*;
 import javax.microedition.lcdui.*;
 import com.hipoqih.plugin.MVC.*;
+import com.hipoqih.plugin.gps.*;
 
-public class Start extends MIDlet implements CommandListener 
+public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderStatusListener
 {
 	private Command exitCommand;
 	private Command goCommand;
-	private Display display;
+	private static Display display;
+    private Object mutex = new Object();
+    private HipoqihData data = null;
 
-	public Start () throws Exception 
+	public HipoqihMIDlet () throws Exception 
 	{ 
-		System.out.println("Empezamos");
 		display = Display.getDisplay(this);
 		MVCComponent.display = display;
 		exitCommand = new Command("EXIT", Command.SCREEN, 2);
 		goCommand = new Command("GO", Command.SCREEN, 1);
+	}
+	
+	public static Display getDisplay()
+	{
+		return display;
 	}
  
 	public void startApp() 
@@ -70,16 +79,26 @@ public class Start extends MIDlet implements CommandListener
 	    } 
 		else if (command == goCommand) 
 		{ 
+	        if (ConfigurationProvider.isLocationApiSupported())
+	        {
+	            ConfigurationProvider.getInstance().autoSearch(this);
+	        }
+	        else
+	        {
+	            Alert alert = new Alert("Error",
+	                    "Location API not supported!", null,
+	                    AlertType.ERROR);
+	            display.setCurrent(alert);
+	        }
+
 			// MainForm need to access life cycle and MIDlet methods
 			MainForm.m = this;
-			(new MainForm()).showScreen();
 	    }
 	}
 	
 	// Load stored state
 	private void loadConfiguration() throws Exception
 	{
-		System.out.println("Entrando en loadConfiguration");
 		State.recordStore = RecordStore.openRecordStore("hipoqih", true);
 		
 		if (State.recordStore.getNumRecords() == 0)
@@ -91,7 +110,7 @@ public class Start extends MIDlet implements CommandListener
 		while(re.hasNextElement())
 		{
 			int id = re.nextRecordId();
-			byte[] record = re.nextRecord();
+			byte[] record = State.recordStore.getRecord(id);
 			int typeId = record[0];
 			processRecord(record, typeId);
 			State.recordMaps.put(new Integer(typeId), new Integer(id));
@@ -213,4 +232,38 @@ public class Start extends MIDlet implements CommandListener
 			rse.printStackTrace();
 		}
 	}
+	
+    public void providerSelectedEvent()
+    {
+        // Attempt to acquire the mutex
+        synchronized (mutex)
+        {
+            // Start scanning location updates. Also set the TouristData
+            // reference data.
+            Gauge indicator = new Gauge(null, false, 50, 1);
+            indicator.setValue(Gauge.CONTINUOUS_RUNNING);
+
+            Alert alert = new Alert("Information",
+                    "Please wait, looking for location data....", null,
+                    AlertType.INFO);
+            alert.setIndicator(indicator);
+
+            display.setCurrent(alert);
+
+            // Inform the user that MIDlet is looking for location data.
+            data = new HipoqihData((ProviderStatusListener) this);
+        }
+    }
+    
+    public void firstLocationUpdateEvent()
+    {
+        // Attempt to acquire the mutex
+        synchronized (mutex)
+        {
+        	MainForm mf = new MainForm();
+        	data.setMainForm(mf);
+			mf.showScreen();
+        }
+    }
+
 }

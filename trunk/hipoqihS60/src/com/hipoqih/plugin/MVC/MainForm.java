@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.*;
 
 import javax.microedition.lcdui.*;
-import javax.microedition.rms.*;
 
 import com.hipoqih.plugin.Web.*;
 import com.hipoqih.plugin.*;
@@ -13,7 +12,7 @@ import com.hipoqih.plugin.*;
  
 public class MainForm extends MVCComponent 
 {
-	public static Start m;
+	public static HipoqihMIDlet m;
 	private static Displayable screen = null; 
 	javax.microedition.lcdui.StringItem strComStatus = new StringItem("", "", StringItem.PLAIN);
 	javax.microedition.lcdui.ImageItem img = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT, "", ImageItem.PLAIN);
@@ -34,6 +33,7 @@ public class MainForm extends MVCComponent
 	javax.microedition.lcdui.Command cmdRefresh = new Command("Refresh position", Command.SCREEN, 0);
 	javax.microedition.lcdui.Command cmdConectar = new Command("Connect", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdMapa = new Command("Map", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdExitMapa = new Command("Exit", Command.SCREEN, 1);
 	private boolean isConnected = false;
 	static public final javax.microedition.lcdui.Command cmdExit = new Command("Exit", Command.EXIT, 0);
 	javax.microedition.lcdui.Image image1;
@@ -91,13 +91,13 @@ public class MainForm extends MVCComponent
 		strDatoLatitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
 		strDatoLatitud.setPreferredSize(80, -1);
 		strDatoLatitud.setLabel("");
-		strDatoLatitud.setText("0.0");
+		strDatoLatitud.setText("41.0");
 		strDatoLatitud.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 		((Form)screen).append(strDatoLatitud);
 		strDatoLongitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		strDatoLongitud.setPreferredSize(80, -1);
 		strDatoLongitud.setLabel("");
-		strDatoLongitud.setText("0.0");
+		strDatoLongitud.setText("-74");
 		strDatoLongitud.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 		((Form)screen).append(strDatoLongitud);
 		spacer1.setPreferredSize(10, 10);
@@ -185,35 +185,46 @@ public class MainForm extends MVCComponent
 		}
 		else if (command == cmdMapa)
 		{
-/*			try
-			{*/
-				int ah = 5;
-				boolean b = true;
-				
-				for (Enumeration e = State.recordMaps.elements(); e.hasMoreElements(); )
-				{
-					System.out.println(e.nextElement());
-				}
-				
-				/*Tools.updateRecord(RecordTypes.USER, "Pepe");
-				System.out.println("Después de la primera llamada:" + Integer.toString(ah));
-				Tools.updateRecord(RecordTypes.ALERTHEIGHT, Integer.toString(ah));
-				System.out.println("Después de la segunda llamada");
-				Tools.updateRecord(RecordTypes.MAPALERT, (b ? "1" : "0"));
-				System.out.println("Después de la tercera llamada");
-				String s = Tools.retrieveRecord(RecordTypes.USER);
-				System.out.println("User: " + s);
-				ah = Integer.parseInt(Tools.retrieveRecord(RecordTypes.ALERTHEIGHT));
-				System.out.println("AlertHeight: " + Integer.toString(ah));
-				System.out.println("MapAlert: " + Tools.retrieveRecord(RecordTypes.MAPALERT));
-			}
-			catch(RecordStoreException rse)
+			if (strDatoLatitud.getText().trim().length() == 0 || strDatoLongitud.getText().trim().length() == 0)
 			{
-				System.out.println(rse.getMessage());
-				rse.printStackTrace();
-			}*/
+				Alert alertScreen = new Alert("Error");
+				alertScreen.setString("There are no position coordinates");
+				alertScreen.setTimeout(Alert.FOREVER);
+				display.setCurrent(alertScreen);
+ 			}
+			try
+			{
+				Form form = new Form("Map");
+				int width = form.getWidth();
+				int height = form.getHeight();
+				Image image = getMap(height, width);
+				form.append(image);
+				form.addCommand(cmdExitMapa);
+				form.setCommandListener(this);
+				display.setCurrent(form);
+			}
+			catch(IOException ioe)
+			{
+				System.out.println(ioe.getMessage());
+				ioe.printStackTrace();
+			}
+			catch(Exception ex)
+			{
+				System.out.println(ex.getMessage());
+				ex.printStackTrace();
+			}
+		}
+		else if(command == cmdExitMapa)
+		{
+			display.setCurrent(this.getScreen());
 		}
     }
+	
+	public void setLocation(String lat, String lon)
+	{
+		strDatoLatitud.setText(lat);
+		strDatoLongitud.setText(lon);
+	}
 	
 	protected void updateView() throws Exception 
 	{
@@ -284,5 +295,32 @@ public class MainForm extends MVCComponent
     	{
     		
     	}
+    }
+    
+    private Image getMap(int height, int width) throws IOException
+    {
+   		double longitude = Double.parseDouble(strDatoLongitud.getText());
+   		double latitude = Double.parseDouble(strDatoLatitud.getText());
+    	
+    	double multipliedLon = longitude * 1000000;
+    	if (multipliedLon < 0)
+    		multipliedLon = multipliedLon + 1073741824 + 1073741824 + 1073741824 + 1073741824;
+    	multipliedLon = Math.floor(multipliedLon);
+    	
+    	double multipliedLat = latitude * 1000000;
+    	if (multipliedLat < 0)
+    		multipliedLat = multipliedLat + 1073741824 + 1073741824 + 1073741824 + 1073741824;
+    	multipliedLat = Math.floor(multipliedLat);
+    	
+    	String urlLatitude = Long.toString((new Double(multipliedLat)).longValue());
+    	String urlLongitude = Long.toString((new Double(multipliedLon)).longValue());
+    	
+    	String url = "http://maps.google.com/mapdata?Point=b&Point.latitude_e6=" + urlLatitude + 
+    				"&Point.longitude_e6=" + urlLongitude + 
+    				"&Point.iconid=15&Point=e&latitude_e6=" + urlLatitude + 
+    				"&longitude_e6=" + urlLongitude + 
+    				"&zm=" + Integer.toString(State.zoom) + "&w=" + width + "&h=" + height + "&cc=EN&min_priority=2";
+    	System.out.println("url: " + url);
+    	return HipoWeb.sendWebRequestImage(url);
     }
 }

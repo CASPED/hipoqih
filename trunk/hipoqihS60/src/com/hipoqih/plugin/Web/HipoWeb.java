@@ -1,23 +1,18 @@
 package com.hipoqih.plugin.Web;
 
-//import java.io.*;
+import java.io.*;
 import java.io.IOException;
-//import javax.microedition.io.*;
+import javax.microedition.io.*;
+import javax.microedition.lcdui.*;
 import com.hipoqih.plugin.*;
 
 public class HipoWeb
 {
 	public static int sendWebReg(String user, String pass) throws IOException
 	{
-		//
-		/*
-		int result;
-		// El texto hasta el primer $$$ marca el tipo de mensaje
 		String url = "http://www.hipoqih.com/alta.php?user="+user+"&pass="+pass;
-		String mensaje = sendWebRequest(url);*/
+		String message = sendWebRequestString(url);
 		
-		String message = "AVISO$$$Esto es el aviso$$$http://$$$12.000000$$$32.000000$$$20$$$Pepito$$$N$$$";
-	 	
 		String[] messages = parseMessage(message);
 
 		if (messages.length == 0)
@@ -53,14 +48,57 @@ public class HipoWeb
 			HipoAlert.Login = messages[6];
 			HipoAlert.IsPositional = messages[7].equals("S");
 			
-			//result = WebResult.OK_AVISO;
 		}
-
-		//return resultado;	
-		return WebResult.OK_AVISO;	
+		
+		return WebResult.OK_AVISO;
 	}
 	
-/*	private static String sendWebRequest(String url) throws IOException
+	public static Image sendWebRequestImage(String url) throws IOException
+	{
+		HttpConnection c = null;
+		InputStream is = null;
+		Image image = null;
+
+		try
+		{
+			// Obtenemos la conexión con la dirección url indicada
+			c = (HttpConnection)Connector.open(url);
+			
+			// Obtener el código de respuesta abrirá la conexión,
+			// enviará la petición, y leerá las cabeceras de la respuesta HTTP.
+			int rc = c.getResponseCode();
+			if (rc != HttpConnection.HTTP_OK )
+			{
+				throw new IOException("Error HTTP:" + rc);
+			}
+			// Obtenemos el "stream" de datos
+			is = c.openInputStream();
+
+			image = Image.createImage(is);
+		}
+		catch (ClassCastException e)
+		{
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			throw new IllegalArgumentException("Not an HTTP URL");
+		}
+		catch(Exception ex)
+		{
+			System.out.println(ex.getMessage());
+			ex.printStackTrace();
+		}
+		finally
+		{
+			if ( is != null )
+				is.close();
+			if ( c != null )
+				c.close();
+		}
+		
+		return image;	
+	}
+	
+	private static String sendWebRequestString(String url) throws IOException
 	{
 		HttpConnection c = null;
 		InputStream is = null;
@@ -107,7 +145,7 @@ public class HipoWeb
 		}
 		
 		return str.toString();
-	}*/
+	}
 	
 	private static String[] parseMessage(String mensaje)
 	{

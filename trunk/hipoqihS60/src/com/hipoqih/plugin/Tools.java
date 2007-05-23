@@ -28,7 +28,6 @@ public class Tools {
 	
 	public static void updateRecord (int recordType, String data) throws RecordStoreException
 	{
-		System.out.println("AlertHeight: " + Integer.toString(recordType) + " " + data);
 		Integer id = (Integer)State.recordMaps.get(new Integer(recordType));
 		int recordLength = 1;
 		byte[] dataBytes = data.getBytes();
