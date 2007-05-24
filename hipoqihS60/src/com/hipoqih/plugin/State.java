@@ -11,7 +11,7 @@ public class State
 	public static String user = "jcanvic";
 	public static String password = "aquelarre";
 	public static boolean connected = false;
-	public static String positionSource = "CONFIG";
+	public static String positionSource = "GPS";
 	public static String latitude = "";
 	public static String longitude = "";
 	public static String seconds = "";
@@ -26,4 +26,5 @@ public class State
 	public static RecordStore recordStore;
 	public static Hashtable recordMaps = new Hashtable();
 	public static int zoom = 10000;
+	public static String secureId = "";
 }

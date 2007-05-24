@@ -2,13 +2,9 @@ package com.hipoqih.plugin.MVC;
 
 import java.io.*;
 import java.util.*;
-
 import javax.microedition.lcdui.*;
-
 import com.hipoqih.plugin.Web.*;
 import com.hipoqih.plugin.*;
-//import com.hipoqih.plugin.gps.*;
-//import com.hipoqih.plugin.task.SelectGPSDeviceTask;
  
 public class MainForm extends MVCComponent 
 {
@@ -30,7 +26,6 @@ public class MainForm extends MVCComponent
 	javax.microedition.lcdui.StringItem strDatoDesde = new StringItem("", "", StringItem.PLAIN);
 	javax.microedition.lcdui.StringItem strAviso = new StringItem("", "", StringItem.PLAIN);
 	javax.microedition.lcdui.Spacer spacer2 = new Spacer(0, 0);
-	javax.microedition.lcdui.Command cmdRefresh = new Command("Refresh position", Command.SCREEN, 0);
 	javax.microedition.lcdui.Command cmdConectar = new Command("Connect", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdMapa = new Command("Map", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdExitMapa = new Command("Exit", Command.SCREEN, 1);
@@ -41,6 +36,11 @@ public class MainForm extends MVCComponent
 	static public final javax.microedition.lcdui.Command cmdConfigurar = new Command("Properties", Command.SCREEN, 0);
 	Temporizador tempo = new Temporizador();
 	Timer timer = new Timer();
+	private double latitude = 0;
+	private double longitude = 0;
+	private double lastSentLon = 0;
+	private double lastSentLat = 0;
+	boolean gpsConnected = false;
 
 	protected void initModel() throws Exception 
 	{
@@ -51,14 +51,206 @@ public class MainForm extends MVCComponent
 		return screen;
 	}
 	
-/*	public static void setGPS(GPS g)
-	{
-		System.out.println(Thread.currentThread().toString() + ": " + "setGPS");
-		State.gps = g;
-	}*/
+	public void commandAction(Command command, Displayable displayable)
+    {
+		// EXIT command
+		if (command == cmdExit)
+		{
+			m.destroyApp(false);
+			m.notifyDestroyed();
+		}		
+		else if ( command == cmdConectar )
+		{
+			if ( isConnected )
+			{
+				strComStatus.setText("Disconnected");
+				img.setImage(imageOff);
+			}
+			else
+			{
+				connectToWeb();
+			}
+			isConnected = !isConnected;
+		}
+		else if (command == cmdMapa)
+		{
+			if (strDatoLatitud.getText().trim().length() == 0 || strDatoLongitud.getText().trim().length() == 0)
+			{
+				Alert alertScreen = new Alert("Error");
+				alertScreen.setString("There are no position coordinates");
+				alertScreen.setTimeout(Alert.FOREVER);
+				display.setCurrent(alertScreen);
+ 			}
+			try
+			{
+				Form form = new Form("Map");
+				int width = form.getWidth();
+				int height = form.getHeight();
+				Image image = getMap(height, width);
+				form.append(image);
+				form.addCommand(cmdExitMapa);
+				form.setCommandListener(this);
+				display.setCurrent(form);
+			}
+			catch(IOException ioe)
+			{
+				System.out.println(ioe.getMessage());
+				ioe.printStackTrace();
+			}
+			catch(Exception ex)
+			{
+				System.out.println(ex.getMessage());
+				ex.printStackTrace();
+			}
+		}
+		else if(command == cmdExitMapa)
+		{
+			display.setCurrent(this.getScreen());
+		}
+    }
 	
+	public void setLocation(double lat, double lon, boolean connected)
+	{
+		latitude = lat;
+		longitude = lon;
+		gpsConnected = connected;
+		System.out.println(Thread.currentThread().getName() + ": setLocation");
+		System.out.println(Thread.currentThread().getName() + ": " + Double.toString(lat));
+		System.out.println(Thread.currentThread().getName() + ": " + Double.toString(lon));
+	}
+	
+	protected void updateView() throws Exception 
+	{
+		createView();
+	}
+	
+	private void connectToWeb()
+	{
+		try
+		{
+			int resultado =  HipoWeb.sendWebReg(State.user, State.password);
+			System.out.println("Resultado sendWebReg:" + Integer.toString(resultado));
+			switch(resultado)
+			{
+			case WebResult.BAD_RESPONSE:
+			case WebResult.ERROR_AVISO:
+			case WebResult.ERROR_CODIGO:
+			case WebResult.UNKNOWN_MESSAGE_TYPE:
+				Alert alertScreen = new Alert("Error");
+				alertScreen.setString("There was an error accessing hipoqih");
+				alertScreen.setTimeout(Alert.FOREVER);
+				display.setCurrent(alertScreen);
+				break;
+			case WebResult.OK_AVISO:
+				if (HipoAlert.IsPositional)
+				{
+					Date hoy = new Date();
+					String textoAviso = Tools.fechaToString(hoy.getTime()) + "\n" +
+								HipoAlert.Login + " is at " + HipoAlert.Distance + " meters."; 
+					strAviso.setText(textoAviso);
+				}
+				else
+				{
+					Date hoy = new Date();
+					String textoAviso = Tools.fechaToString(hoy.getTime()) + "\n" +
+										HipoAlert.Text;
+					strDatoDeUsuario.setText(HipoAlert.Login);
+					strDatoDesde.setText(HipoAlert.Distance +  " meters");
+					strAviso.setText(textoAviso);
+				}
+				break;
+			case WebResult.OK_CODIGO:
+				break;
+			}
+		}
+		catch (IOException ex)
+		{
+			strAviso.setText("error");
+		}
+		strComStatus.setText("Connected");
+		img.setImage(imageOn);
+	}
+	
+	class Temporizador extends TimerTask
+	{
+		public void run()
+		{
+			sendPosition();
+   	 	}
+    }
+	
+    private void sendPosition()
+    {
+    	if (!State.connected)
+    	{
+    		System.out.println(Thread.currentThread().getName() + ": antes de connectToWeb");
+    		connectToWeb();
+    	}
+    	if (State.positionSource.equals("GPS"))
+    	{
+    		if (gpsConnected)
+    		{
+    			System.out.println(Thread.currentThread().getName() + ": GPS connected");
+    			String lat = Double.toString(latitude);
+    			String lon = Double.toString(longitude);
+    			System.out.println(Thread.currentThread().getName() + ": \n" + lat + "\n" + lon);
+    			System.out.println(Thread.currentThread().getName() + ": IdSecure " + State.secureId);
+    			strDatoLatitud.setText(lat);
+    			strDatoLongitud.setText(lon);
+    			if (Math.abs(latitude - lastSentLat) > 0.00001 || Math.abs(longitude - lastSentLon) > 0.00001)
+    			{
+    				try
+    				{
+    					HipoWeb.sendWebPos(lat, lon);
+    				}
+    				catch(IOException ioe)
+    				{
+    					isConnected = false;
+    					img.setImage(imageOff);
+    					System.out.println(ioe.getMessage());
+    					ioe.printStackTrace();
+    				}
+    			}
+    		}
+    		else
+    		{
+    			System.out.println(Thread.currentThread().getName() + ": GPS not connected");
+    			strDatoLatitud.setText("Unavailable");
+    			strDatoLongitud.setText("Unavailable");
+    		}
+    	}
+    }
+    
+    private Image getMap(int height, int width) throws IOException
+    {
+   		double longitude = Double.parseDouble(strDatoLongitud.getText());
+   		double latitude = Double.parseDouble(strDatoLatitud.getText());
+    	
+    	double multipliedLon = longitude * 1000000;
+    	if (multipliedLon < 0)
+    		multipliedLon = multipliedLon + 1073741824 + 1073741824 + 1073741824 + 1073741824;
+    	multipliedLon = Math.floor(multipliedLon);
+    	
+    	double multipliedLat = latitude * 1000000;
+    	if (multipliedLat < 0)
+    		multipliedLat = multipliedLat + 1073741824 + 1073741824 + 1073741824 + 1073741824;
+    	multipliedLat = Math.floor(multipliedLat);
+    	
+    	String urlLatitude = Long.toString((new Double(multipliedLat)).longValue());
+    	String urlLongitude = Long.toString((new Double(multipliedLon)).longValue());
+    	
+    	String url = "http://maps.google.com/mapdata?Point=b&Point.latitude_e6=" + urlLatitude + 
+    				"&Point.longitude_e6=" + urlLongitude + 
+    				"&Point.iconid=15&Point=e&latitude_e6=" + urlLatitude + 
+    				"&longitude_e6=" + urlLongitude + 
+    				"&zm=" + Integer.toString(State.zoom) + "&w=" + width + "&h=" + height + "&cc=EN&min_priority=2";
+    	System.out.println("url: " + url);
+    	return HipoWeb.sendWebRequestImage(url);
+    }
+    
 	protected void createView() throws Exception 
 	{
+		System.out.println(Thread.currentThread().getName() + ": createView");
 		screen = new Form("Hipoqih");
 		strComStatus.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 		strComStatus.setLabel("");
@@ -132,195 +324,10 @@ public class MainForm extends MVCComponent
 		strAviso.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_ITALIC, Font.SIZE_SMALL));
 		strAviso.setPreferredSize(-1, -1);
 		((Form)screen).append(strAviso);
-		screen.addCommand(cmdRefresh);
 		screen.addCommand(cmdConectar);
 		screen.addCommand(cmdMapa);
 		screen.addCommand(cmdAcercaDe);
 		screen.addCommand(cmdExit);		
-		//timer.schedule(tempo, 1000, 1000);
+		timer.schedule(tempo, 1000, 1000);
 	}
-
-	public void commandAction(Command command, Displayable displayable)
-    {
-		
-		// EXIT command
-		if (command == cmdExit)
-		{
-			m.destroyApp(false);
-			m.notifyDestroyed();
-		}		
-		else if ( command == cmdConectar )
-		{
-			if ( isConnected )
-			{
-				strComStatus.setText("Disconnected");
-				img.setImage(imageOff);
-			}
-			else
-			{
-				connectToWeb();
-			}
-			isConnected = !isConnected;
-		}
-		else if (command == cmdRefresh)
-		{
-/*			if (State.gps == null)
-			{
-				try
-				{
-					SelectGPSDeviceTask s = new SelectGPSDeviceTask(display);
-					s.go();
-				}
-				catch(Exception ex)
-				{
-					Alert a = new Alert("Error looking for Bluetooth devices");
-					a.setTimeout(Alert.FOREVER);
-					display.setCurrent(a);
-				}
-			}
-			else
-			{
-				strAviso.setText(State.gps.getNMEAMessage());
-			}*/
-		}
-		else if (command == cmdMapa)
-		{
-			if (strDatoLatitud.getText().trim().length() == 0 || strDatoLongitud.getText().trim().length() == 0)
-			{
-				Alert alertScreen = new Alert("Error");
-				alertScreen.setString("There are no position coordinates");
-				alertScreen.setTimeout(Alert.FOREVER);
-				display.setCurrent(alertScreen);
- 			}
-			try
-			{
-				Form form = new Form("Map");
-				int width = form.getWidth();
-				int height = form.getHeight();
-				Image image = getMap(height, width);
-				form.append(image);
-				form.addCommand(cmdExitMapa);
-				form.setCommandListener(this);
-				display.setCurrent(form);
-			}
-			catch(IOException ioe)
-			{
-				System.out.println(ioe.getMessage());
-				ioe.printStackTrace();
-			}
-			catch(Exception ex)
-			{
-				System.out.println(ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
-		else if(command == cmdExitMapa)
-		{
-			display.setCurrent(this.getScreen());
-		}
-    }
-	
-	public void setLocation(String lat, String lon)
-	{
-		strDatoLatitud.setText(lat);
-		strDatoLongitud.setText(lon);
-	}
-	
-	protected void updateView() throws Exception 
-	{
-		createView();
-	}
-	
-	private void connectToWeb()
-	{
-		try
-		{
-			int resultado =  HipoWeb.sendWebReg(State.user, State.password);
-			switch(resultado)
-			{
-			case WebResult.BAD_RESPONSE:
-			case WebResult.ERROR_AVISO:
-			case WebResult.ERROR_CODIGO:
-			case WebResult.UNKNOWN_MESSAGE_TYPE:
-				Alert alertScreen = new Alert("Error");
-				alertScreen.setString("There was an error accessing hipoqih");
-				alertScreen.setTimeout(Alert.FOREVER);
-				display.setCurrent(alertScreen);
-				break;
-			case WebResult.OK_AVISO:
-				if (HipoAlert.IsPositional)
-				{
-					Date hoy = new Date();
-					String textoAviso = Tools.fechaToString(hoy.getTime()) + "\n" +
-								HipoAlert.Login + " is at " + HipoAlert.Distance + " meters."; 
-					strAviso.setText(textoAviso);
-				}
-				else
-				{
-					Date hoy = new Date();
-					String textoAviso = Tools.fechaToString(hoy.getTime()) + "\n" +
-										HipoAlert.Text;
-					strDatoDeUsuario.setText(HipoAlert.Login);
-					strDatoDesde.setText(HipoAlert.Distance +  " meters");
-					strAviso.setText(textoAviso);
-				}
-				break;
-			case WebResult.OK_CODIGO:
-				break;
-			}
-		}
-		catch (IOException ex)
-		{
-			strAviso.setText("error");
-		}
-		strComStatus.setText("Connected");
-		img.setImage(imageOn);
-	}
-	
-	class Temporizador extends TimerTask
-	{
-		public void run()
-		{
-			sendPosition();
-   	 	}
-    }
-	
-    private void sendPosition()
-    {
-    	if (!State.connected)
-    	{
-    		connectToWeb();
-    	}
-    	if (State.positionSource.equals("CONFIG"))
-    	{
-    		
-    	}
-    }
-    
-    private Image getMap(int height, int width) throws IOException
-    {
-   		double longitude = Double.parseDouble(strDatoLongitud.getText());
-   		double latitude = Double.parseDouble(strDatoLatitud.getText());
-    	
-    	double multipliedLon = longitude * 1000000;
-    	if (multipliedLon < 0)
-    		multipliedLon = multipliedLon + 1073741824 + 1073741824 + 1073741824 + 1073741824;
-    	multipliedLon = Math.floor(multipliedLon);
-    	
-    	double multipliedLat = latitude * 1000000;
-    	if (multipliedLat < 0)
-    		multipliedLat = multipliedLat + 1073741824 + 1073741824 + 1073741824 + 1073741824;
-    	multipliedLat = Math.floor(multipliedLat);
-    	
-    	String urlLatitude = Long.toString((new Double(multipliedLat)).longValue());
-    	String urlLongitude = Long.toString((new Double(multipliedLon)).longValue());
-    	
-    	String url = "http://maps.google.com/mapdata?Point=b&Point.latitude_e6=" + urlLatitude + 
-    				"&Point.longitude_e6=" + urlLongitude + 
-    				"&Point.iconid=15&Point=e&latitude_e6=" + urlLatitude + 
-    				"&longitude_e6=" + urlLongitude + 
-    				"&zm=" + Integer.toString(State.zoom) + "&w=" + width + "&h=" + height + "&cc=EN&min_priority=2";
-    	System.out.println("url: " + url);
-    	return HipoWeb.sendWebRequestImage(url);
-    }
 }

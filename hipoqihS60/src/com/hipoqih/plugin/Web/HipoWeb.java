@@ -11,7 +11,9 @@ public class HipoWeb
 	public static int sendWebReg(String user, String pass) throws IOException
 	{
 		String url = "http://www.hipoqih.com/alta.php?user="+user+"&pass="+pass;
+		System.out.println("Url: " + url);
 		String message = sendWebRequestString(url);
+		int result = WebResult.UNKNOWN_MESSAGE_TYPE;
 		
 		String[] messages = parseMessage(message);
 
@@ -23,18 +25,19 @@ public class HipoWeb
 		// Si el tipo es CODIGO, obtenemos el IdSeguro
 		if (messageType.equals("CODIGO"))
 		{
-			String secureID = messages[1];
-			
-			if (secureID.equals("ERROR"))
+			State.secureId = messages[1];
+			System.out.println("WebReg CODIGO: " + State.secureId);
+			if (State.secureId.equals("ERROR"))
 			{
 				return WebResult.ERROR_CODIGO;
 			}
 			State.connected = true;
-			//result = WebResult.OK_CODIGO;
+			result = WebResult.OK_CODIGO;
 		}
 		
 		if (messageType.equals("AVISO"))
 		{
+			System.out.println("WebReg AVIS: " + messages[1]);
 			if (messages.length != 8)
 			{
 				return WebResult.ERROR_AVISO;
@@ -47,10 +50,11 @@ public class HipoWeb
 			HipoAlert.Distance = messages[5];
 			HipoAlert.Login = messages[6];
 			HipoAlert.IsPositional = messages[7].equals("S");
+			result = WebResult.OK_AVISO;
 			
 		}
 		
-		return WebResult.OK_AVISO;
+		return result;
 	}
 	
 	public static Image sendWebRequestImage(String url) throws IOException
@@ -145,6 +149,12 @@ public class HipoWeb
 		}
 		
 		return str.toString();
+	}
+	
+	public static void sendWebPos(String lat, String lon) throws IOException
+	{
+		String url = "http://www.hipoqih.com/oreja.php?iduser=" + State.secureId + "&lat=" + lat + "&lon=" + lon;
+		sendWebRequestString(url);
 	}
 	
 	private static String[] parseMessage(String mensaje)

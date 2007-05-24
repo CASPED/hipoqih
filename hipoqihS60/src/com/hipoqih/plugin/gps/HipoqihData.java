@@ -51,11 +51,11 @@ public class HipoqihData implements LocationListener, ProximityListener
                     if (location != null && location.isValid())
                     {
                         QualifiedCoordinates coord = location.getQualifiedCoordinates();
-                        mainForm.setLocation(Double.toString(coord.getLatitude()),Double.toString(coord.getLongitude()));
+                        mainForm.setLocation(coord.getLatitude(), coord.getLongitude(), true);
                     }
                     else
                     {
-                        mainForm.setLocation("Unavailable", "Unavailable");
+                        mainForm.setLocation(0, 0, false);
                     }
                 }
             }.start();
@@ -73,16 +73,16 @@ public class HipoqihData implements LocationListener, ProximityListener
                 {
                     switch (newState) {
                         case LocationProvider.AVAILABLE:
-                        	mainForm.setLocation("Unavailable", "Unavailable");
+                        	mainForm.setLocation(0, 0, false);
                             break;
                         case LocationProvider.OUT_OF_SERVICE:
-                        	mainForm.setLocation("Out of service", "Out of service");
+                        	mainForm.setLocation(0, 0, false);
                             break;
                         case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                        	mainForm.setLocation("Temporarily Unavailable", "Temporarily Unavailable");
+                        	mainForm.setLocation(0, 0, false);
                             break;
                         default:
-                        	mainForm.setLocation("Unknown", "Unknown");
+                        	mainForm.setLocation(0, 0, false);
                             break;
                     }
                 }
