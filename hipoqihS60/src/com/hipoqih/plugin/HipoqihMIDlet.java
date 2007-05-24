@@ -5,7 +5,8 @@ package com.hipoqih.plugin;
 import javax.microedition.midlet.*;
 import javax.microedition.rms.*;
 import javax.microedition.lcdui.*;
-import com.hipoqih.plugin.MVC.*;
+
+import com.hipoqih.plugin.UI.*;
 import com.hipoqih.plugin.gps.*;
 
 public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderStatusListener
@@ -18,9 +19,7 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
 
 	public HipoqihMIDlet () throws Exception 
 	{ 
-		//System.out.println("Iniciando");
 		display = Display.getDisplay(this);
-		MVCComponent.display = display;
 		exitCommand = new Command("EXIT", Command.SCREEN, 2);
 		goCommand = new Command("GO", Command.SCREEN, 1);
 	}
@@ -40,7 +39,7 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
 			
 			// Other methods might use static secuirty info
 			// without init UpdateToken object first.
-//			(new MainForm()).prepareScreen();
+//			(new MainFormUI()).prepareScreen();
 	    } 
 		catch (Exception e) 
 	    {
@@ -92,8 +91,8 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
 	            display.setCurrent(alert);
 	        }
 
-			// MainForm need to access life cycle and MIDlet methods
-			MainForm.m = this;
+			// MainFormUI need to access life cycle and MIDlet methods
+			MainFormUI.m = this;
 	    }
 	}
 	
@@ -261,9 +260,9 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
         // Attempt to acquire the mutex
         synchronized (mutex)
         {
-        	MainForm mf = new MainForm();
+        	MainFormUI mf = new MainFormUI();
         	data.setMainForm(mf);
-			mf.showScreen();
+        	display.setCurrent(mf);
         }
     }
 

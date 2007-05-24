@@ -1,13 +1,14 @@
 package com.hipoqih.plugin.gps;
 
 import javax.microedition.location.*;
-import com.hipoqih.plugin.MVC.*;
+
+import com.hipoqih.plugin.UI.*;
 
 public class HipoqihData implements LocationListener, ProximityListener 
 {
     private ProviderStatusListener statusListener = null;
     private boolean firstLocationUpdate = false;
-    private MainForm mainForm = null;
+    private MainFormUI mainForm = null;
 
     public HipoqihData(ProviderStatusListener listener)
     {
@@ -27,7 +28,7 @@ public class HipoqihData implements LocationListener, ProximityListener
         }
     }
     
-    public void setMainForm(MainForm mf)
+    public void setMainForm(MainFormUI mf)
     {
         mainForm = mf;
     }
