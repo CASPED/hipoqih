@@ -18,6 +18,7 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
 
 	public HipoqihMIDlet () throws Exception 
 	{ 
+		//System.out.println("Iniciando");
 		display = Display.getDisplay(this);
 		MVCComponent.display = display;
 		exitCommand = new Command("EXIT", Command.SCREEN, 2);

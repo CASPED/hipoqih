@@ -11,7 +11,6 @@ public class HipoWeb
 	public static int sendWebReg(String user, String pass) throws IOException
 	{
 		String url = "http://www.hipoqih.com/alta.php?user="+user+"&pass="+pass;
-		System.out.println("Url: " + url);
 		String message = sendWebRequestString(url);
 		int result = WebResult.UNKNOWN_MESSAGE_TYPE;
 		
