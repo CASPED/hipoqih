@@ -8,8 +8,8 @@ import javax.microedition.rms.RecordStore;
 
 public class State 
 {
-	public static String user = "jcanvic";
-	public static String password = "aquelarre";
+	public static String user = "dferdom";
+	public static String password = "dfd";
 	public static boolean connected = false;
 	public static String positionSource = "GPS";
 	public static String latitude = "";
