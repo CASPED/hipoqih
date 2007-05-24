@@ -39,7 +39,7 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
 			
 			// Other methods might use static secuirty info
 			// without init UpdateToken object first.
-			(new MainForm()).prepareScreen();
+//			(new MainForm()).prepareScreen();
 	    } 
 		catch (Exception e) 
 	    {
