@@ -15,27 +15,29 @@ public class MainForm extends MVCComponent
 	javax.microedition.lcdui.Image imageOn;
 	javax.microedition.lcdui.Image imageOff;
 	javax.microedition.lcdui.Spacer spacer0 = new Spacer(0, 0);
-	javax.microedition.lcdui.StringItem strLatitud = new StringItem("", "", StringItem.PLAIN);
-	javax.microedition.lcdui.StringItem strLongitud = new StringItem("", "", StringItem.PLAIN);
-	javax.microedition.lcdui.StringItem strDatoLatitud = new StringItem("", "", StringItem.PLAIN);
-	javax.microedition.lcdui.StringItem strDatoLongitud = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strLatitude = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strLongitude = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strLatitudeData = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strLongitudeData = new StringItem("", "", StringItem.PLAIN);
 	javax.microedition.lcdui.Spacer spacer1 = new Spacer(0, 0);
-	javax.microedition.lcdui.StringItem strDeUsuario = new StringItem("", "", StringItem.PLAIN);
-	javax.microedition.lcdui.StringItem strDesde = new StringItem("", "", StringItem.PLAIN);
-	javax.microedition.lcdui.StringItem strDatoDeUsuario = new StringItem("", "", StringItem.PLAIN);
-	javax.microedition.lcdui.StringItem strDatoDesde = new StringItem("", "", StringItem.PLAIN);
-	javax.microedition.lcdui.StringItem strAviso = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strFromUser = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strDistance = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strFromUserData = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strDistanceData = new StringItem("", "", StringItem.PLAIN);
+	javax.microedition.lcdui.StringItem strAlert = new StringItem("", "", StringItem.PLAIN);
 	javax.microedition.lcdui.Spacer spacer2 = new Spacer(0, 0);
-	javax.microedition.lcdui.Command cmdConectar = new Command("Connect", Command.SCREEN, 1);
-	javax.microedition.lcdui.Command cmdMapa = new Command("Map", Command.SCREEN, 1);
-	javax.microedition.lcdui.Command cmdExitMapa = new Command("Exit", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdConnect = new Command("Connect", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdDisconnect = new Command("Disconnect", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdMap = new Command("Map", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdExitMap = new Command("Exit", Command.SCREEN, 1);
 	private boolean isConnected = false;
 	static public final javax.microedition.lcdui.Command cmdExit = new Command("Exit", Command.EXIT, 0);
 	javax.microedition.lcdui.Image image1;
 	javax.microedition.lcdui.Command cmdAcercaDe = new Command("About Hipoqih", Command.SCREEN, 1);
 	static public final javax.microedition.lcdui.Command cmdConfigurar = new Command("Properties", Command.SCREEN, 0);
-	Temporizador tempo = new Temporizador();
-	Timer timer = new Timer();
+	private WebTimerTask webTimerTask = new WebTimerTask();
+	private UITimerTask uiTimerTask = new UITimerTask();
+	private Timer timer = new Timer();
 	private double latitude = 0;
 	private double longitude = 0;
 	private double lastSentLon = 0;
@@ -59,22 +61,53 @@ public class MainForm extends MVCComponent
 			m.destroyApp(false);
 			m.notifyDestroyed();
 		}		
-		else if ( command == cmdConectar )
+		else if ( command == cmdConnect )
 		{
-			if ( isConnected )
+			if ( !isConnected )
 			{
-				strComStatus.setText("Disconnected");
-				img.setImage(imageOff);
+				try
+				{
+					System.out.println("cmdConnect->not connected");
+					connectToWeb();
+					uiTimerTask.cancel();
+					webTimerTask = new WebTimerTask();
+					timer.schedule(webTimerTask, 0, 2000);
+					isConnected = true;
+					strComStatus.setText("Connected");
+					img.setImage(imageOn);
+				}
+				catch(Exception ex)
+				{
+					System.out.println(Thread.currentThread().getName() + ": cmdConnect");
+					System.out.println(ex.toString());
+					ex.printStackTrace();
+				}
 			}
-			else
-			{
-				connectToWeb();
-			}
-			isConnected = !isConnected;
 		}
-		else if (command == cmdMapa)
+		else if ( command == cmdDisconnect)
 		{
-			if (strDatoLatitud.getText().trim().length() == 0 || strDatoLongitud.getText().trim().length() == 0)
+			if (isConnected)
+			{
+				try
+				{
+					isConnected = false;
+					strComStatus.setText("Disconnected");
+					img.setImage(imageOff);
+					webTimerTask.cancel();
+					uiTimerTask = new UITimerTask();
+					timer.schedule(uiTimerTask, 0, 2000);
+				}
+				catch(Exception ex)
+				{
+					System.out.println(Thread.currentThread().getName() + ": cmdDisconnect");
+					System.out.println(ex.toString());
+					ex.printStackTrace();
+				}
+			}
+		}
+		else if (command == cmdMap)
+		{
+			if (strLatitudeData.getText().trim().length() == 0 || strLongitudeData.getText().trim().length() == 0)
 			{
 				Alert alertScreen = new Alert("Error");
 				alertScreen.setString("There are no position coordinates");
@@ -88,7 +121,7 @@ public class MainForm extends MVCComponent
 				int height = form.getHeight();
 				Image image = getMap(height, width);
 				form.append(image);
-				form.addCommand(cmdExitMapa);
+				form.addCommand(cmdExitMap);
 				form.setCommandListener(this);
 				display.setCurrent(form);
 			}
@@ -103,7 +136,7 @@ public class MainForm extends MVCComponent
 				ex.printStackTrace();
 			}
 		}
-		else if(command == cmdExitMapa)
+		else if(command == cmdExitMap)
 		{
 			display.setCurrent(this.getScreen());
 		}
@@ -114,9 +147,6 @@ public class MainForm extends MVCComponent
 		latitude = lat;
 		longitude = lon;
 		gpsConnected = connected;
-		System.out.println(Thread.currentThread().getName() + ": setLocation");
-		System.out.println(Thread.currentThread().getName() + ": " + Double.toString(lat));
-		System.out.println(Thread.currentThread().getName() + ": " + Double.toString(lon));
 	}
 	
 	protected void updateView() throws Exception 
@@ -129,7 +159,6 @@ public class MainForm extends MVCComponent
 		try
 		{
 			int resultado =  HipoWeb.sendWebReg(State.user, State.password);
-			System.out.println("Resultado sendWebReg:" + Integer.toString(resultado));
 			switch(resultado)
 			{
 			case WebResult.BAD_RESPONSE:
@@ -147,16 +176,16 @@ public class MainForm extends MVCComponent
 					Date hoy = new Date();
 					String textoAviso = Tools.fechaToString(hoy.getTime()) + "\n" +
 								HipoAlert.Login + " is at " + HipoAlert.Distance + " meters."; 
-					strAviso.setText(textoAviso);
+					strAlert.setText(textoAviso);
 				}
 				else
 				{
 					Date hoy = new Date();
 					String textoAviso = Tools.fechaToString(hoy.getTime()) + "\n" +
 										HipoAlert.Text;
-					strDatoDeUsuario.setText(HipoAlert.Login);
-					strDatoDesde.setText(HipoAlert.Distance +  " meters");
-					strAviso.setText(textoAviso);
+					strFromUserData.setText(HipoAlert.Login);
+					strDistanceData.setText(HipoAlert.Distance +  " meters");
+					strAlert.setText(textoAviso);
 				}
 				break;
 			case WebResult.OK_CODIGO:
@@ -165,43 +194,81 @@ public class MainForm extends MVCComponent
 		}
 		catch (IOException ex)
 		{
-			strAviso.setText("error");
+			strAlert.setText("error");
 		}
-		strComStatus.setText("Connected");
-		img.setImage(imageOn);
 	}
 	
-	class Temporizador extends TimerTask
+	class WebTimerTask extends TimerTask
 	{
 		public void run()
 		{
-			sendPosition();
+			try
+			{
+				sendPosition();
+			}
+			catch(Exception ex)
+			{
+				System.out.println(Thread.currentThread().getName() + ": sendPosition");
+				System.out.println(ex.getMessage());
+				ex.printStackTrace();
+			}
    	 	}
     }
+	
+	class UITimerTask extends TimerTask
+	{
+		public void run()
+		{
+			try
+			{
+				updateCoorUI();
+			}
+			catch(Exception ex)
+			{
+				System.out.println(Thread.currentThread().getName() + ": updateCoorUI");
+				System.out.println(ex.getMessage());
+				ex.printStackTrace();
+			}
+  	 	}
+	}
+	
+	private void updateCoorUI()
+	{
+		if (gpsConnected)
+		{
+			String lat = Double.toString(latitude);
+			if (lat.length() > 8)
+				lat = lat.substring(0, 8);
+			String lon = Double.toString(longitude);
+			if (lon.length() > 8)
+				lon = lon.substring(0, 8);
+			strLatitudeData.setText(lat);
+			strLongitudeData.setText(lon);
+		}
+		else
+		{
+			strLatitudeData.setText("Unavailable");
+			strLongitudeData.setText("Unavailable");
+		}
+	}
+	
 	
     private void sendPosition()
     {
     	if (!State.connected)
     	{
-    		System.out.println(Thread.currentThread().getName() + ": antes de connectToWeb");
     		connectToWeb();
     	}
     	if (State.positionSource.equals("GPS"))
     	{
     		if (gpsConnected)
     		{
-    			System.out.println(Thread.currentThread().getName() + ": GPS connected");
-    			String lat = Double.toString(latitude);
-    			String lon = Double.toString(longitude);
-    			System.out.println(Thread.currentThread().getName() + ": \n" + lat + "\n" + lon);
-    			System.out.println(Thread.currentThread().getName() + ": IdSecure " + State.secureId);
-    			strDatoLatitud.setText(lat);
-    			strDatoLongitud.setText(lon);
+    			updateCoorUI();
     			if (Math.abs(latitude - lastSentLat) > 0.00001 || Math.abs(longitude - lastSentLon) > 0.00001)
     			{
     				try
     				{
-    					HipoWeb.sendWebPos(lat, lon);
+    					HipoWeb.sendWebPos(strLatitudeData.getText(), strLongitudeData.getText());
     				}
     				catch(IOException ioe)
     				{
@@ -214,17 +281,16 @@ public class MainForm extends MVCComponent
     		}
     		else
     		{
-    			System.out.println(Thread.currentThread().getName() + ": GPS not connected");
-    			strDatoLatitud.setText("Unavailable");
-    			strDatoLongitud.setText("Unavailable");
+    			strLatitudeData.setText("Unavailable");
+    			strLongitudeData.setText("Unavailable");
     		}
     	}
     }
     
     private Image getMap(int height, int width) throws IOException
     {
-   		double longitude = Double.parseDouble(strDatoLongitud.getText());
-   		double latitude = Double.parseDouble(strDatoLatitud.getText());
+   		double longitude = Double.parseDouble(strLongitudeData.getText());
+   		double latitude = Double.parseDouble(strLatitudeData.getText());
     	
     	double multipliedLon = longitude * 1000000;
     	if (multipliedLon < 0)
@@ -244,13 +310,11 @@ public class MainForm extends MVCComponent
     				"&Point.iconid=15&Point=e&latitude_e6=" + urlLatitude + 
     				"&longitude_e6=" + urlLongitude + 
     				"&zm=" + Integer.toString(State.zoom) + "&w=" + width + "&h=" + height + "&cc=EN&min_priority=2";
-    	System.out.println("url: " + url);
     	return HipoWeb.sendWebRequestImage(url);
     }
     
 	protected void createView() throws Exception 
 	{
-		System.out.println(Thread.currentThread().getName() + ": createView");
 		screen = new Form("Hipoqih");
 		strComStatus.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 		strComStatus.setLabel("");
@@ -268,66 +332,66 @@ public class MainForm extends MVCComponent
 		spacer0.setPreferredSize(10, 10);
 		spacer0.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		((Form)screen).append(spacer0);
-		strLatitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
-		strLatitud.setPreferredSize(80, -1);
-		strLatitud.setLabel("");
-		strLatitud.setText("Latitude");
-		strLatitud.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-		((Form)screen).append(strLatitud);
-		strLongitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
-		strLongitud.setPreferredSize(80, -1);
-		strLongitud.setLabel("");
-		strLongitud.setText("Longitude");
-		strLongitud.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-		((Form)screen).append(strLongitud);
-		strDatoLatitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
-		strDatoLatitud.setPreferredSize(80, -1);
-		strDatoLatitud.setLabel("");
-		strDatoLatitud.setText("41.0");
-		strDatoLatitud.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-		((Form)screen).append(strDatoLatitud);
-		strDatoLongitud.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
-		strDatoLongitud.setPreferredSize(80, -1);
-		strDatoLongitud.setLabel("");
-		strDatoLongitud.setText("-74");
-		strDatoLongitud.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-		((Form)screen).append(strDatoLongitud);
+		strLatitude.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
+		strLatitude.setPreferredSize(80, -1);
+		strLatitude.setLabel("");
+		strLatitude.setText("Latitude");
+		strLatitude.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
+		((Form)screen).append(strLatitude);
+		strLongitude.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
+		strLongitude.setPreferredSize(80, -1);
+		strLongitude.setLabel("");
+		strLongitude.setText("Longitude");
+		strLongitude.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
+		((Form)screen).append(strLongitude);
+		strLatitudeData.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
+		strLatitudeData.setPreferredSize(80, -1);
+		strLatitudeData.setLabel("");
+		strLatitudeData.setText("41.0");
+		strLatitudeData.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+		((Form)screen).append(strLatitudeData);
+		strLongitudeData.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
+		strLongitudeData.setPreferredSize(80, -1);
+		strLongitudeData.setLabel("");
+		strLongitudeData.setText("-74");
+		strLongitudeData.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+		((Form)screen).append(strLongitudeData);
 		spacer1.setPreferredSize(10, 10);
 		spacer1.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		((Form)screen).append(spacer1);
-		strDeUsuario.setText("Last alert:  ");
-		strDeUsuario.setLabel("");
-		strDeUsuario.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
-		strDeUsuario.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-		((Form)screen).append(strDeUsuario);
-		strDatoDeUsuario.setText("User");
-		strDatoDeUsuario.setLabel("");
-		strDatoDeUsuario.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
-		strDatoDeUsuario.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-		((Form)screen).append(strDatoDeUsuario);
-		strDesde.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
-		strDesde.setLabel("");
-		strDesde.setText("From:  ");
-		strDesde.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-		((Form)screen).append(strDesde);
-		strDatoDesde.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
-		strDatoDesde.setLabel("");
-		strDatoDesde.setText("  x meters");
-		strDatoDesde.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-		((Form)screen).append(strDatoDesde);
+		strFromUser.setText("Last alert:  ");
+		strFromUser.setLabel("");
+		strFromUser.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
+		strFromUser.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
+		((Form)screen).append(strFromUser);
+		strFromUserData.setText("User");
+		strFromUserData.setLabel("");
+		strFromUserData.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
+		strFromUserData.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+		((Form)screen).append(strFromUserData);
+		strDistance.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
+		strDistance.setLabel("");
+		strDistance.setText("From:  ");
+		strDistance.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
+		((Form)screen).append(strDistance);
+		strDistanceData.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
+		strDistanceData.setLabel("");
+		strDistanceData.setText("  x meters");
+		strDistanceData.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
+		((Form)screen).append(strDistanceData);
 		spacer2.setPreferredSize(10, 10);
 		spacer2.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_2);
 		((Form)screen).append(spacer2);
-		strAviso.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
-		strAviso.setLabel("");
-		strAviso.setText("This is the alert message.");
-		strAviso.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_ITALIC, Font.SIZE_SMALL));
-		strAviso.setPreferredSize(-1, -1);
-		((Form)screen).append(strAviso);
-		screen.addCommand(cmdConectar);
-		screen.addCommand(cmdMapa);
+		strAlert.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
+		strAlert.setLabel("");
+		strAlert.setText("This is the alert message.");
+		strAlert.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_ITALIC, Font.SIZE_SMALL));
+		strAlert.setPreferredSize(-1, -1);
+		((Form)screen).append(strAlert);
+		screen.addCommand(cmdConnect);
+		screen.addCommand(cmdDisconnect);
+		screen.addCommand(cmdMap);
 		screen.addCommand(cmdAcercaDe);
 		screen.addCommand(cmdExit);		
-		timer.schedule(tempo, 1000, 1000);
 	}
 }
