@@ -9,7 +9,6 @@ import com.hipoqih.plugin.*;
 public class MainFormUI extends Form implements CommandListener
 {
 	public static HipoqihMIDlet m;
-	private static Displayable screen = null; 
 	javax.microedition.lcdui.StringItem strComStatus = new StringItem("", "", StringItem.PLAIN);
 	javax.microedition.lcdui.ImageItem img = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT, "", ImageItem.PLAIN);
 	javax.microedition.lcdui.Image imageOn;
@@ -29,11 +28,12 @@ public class MainFormUI extends Form implements CommandListener
 	javax.microedition.lcdui.Command cmdConnect = new Command("Connect", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdDisconnect = new Command("Disconnect", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdMap = new Command("Map", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdSettings = new Command("Settings", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdExitMap = new Command("Exit", Command.SCREEN, 1);
 	private boolean isConnected = false;
 	static public final javax.microedition.lcdui.Command cmdExit = new Command("Exit", Command.EXIT, 0);
 	javax.microedition.lcdui.Image image1;
-	javax.microedition.lcdui.Command cmdAcercaDe = new Command("About Hipoqih", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdAbout = new Command("About Hipoqih", Command.SCREEN, 1);
 	static public final javax.microedition.lcdui.Command cmdConfigurar = new Command("Properties", Command.SCREEN, 0);
 	private WebTimerTask webTimerTask = new WebTimerTask();
 	private UITimerTask uiTimerTask = new UITimerTask();
@@ -47,93 +47,99 @@ public class MainFormUI extends Form implements CommandListener
 	public MainFormUI()
 	{
 		super("HipoqihPlugin");
+		setCommandListener(this);
+		try
+		{
+			initModel();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(ex.getMessage());
+			ex.printStackTrace();
+		}
 	}
 
 	protected void initModel() throws Exception 
 	{
-		screen = new Form("Hipoqih");
 		strComStatus.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
 		strComStatus.setLabel("");
 		strComStatus.setText("Disconnected");
 		strComStatus.setLayout(Item.LAYOUT_2);
 		strComStatus.setPreferredSize(-1, -1);
-		((Form)screen).append(strComStatus);
+		this.append(strComStatus);
 		imageOff = Image.createImage("/off.bmp");
 		imageOn = Image.createImage("/on.bmp");
 		img.setImage(imageOff);
 		img.setLabel("");
 		img.setLayout(Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		img.setAltText("");
-		((Form)screen).append(img);
+		this.append(img);
 		spacer0.setPreferredSize(10, 10);
 		spacer0.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
-		((Form)screen).append(spacer0);
+		this.append(spacer0);
 		strLatitude.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
 		strLatitude.setPreferredSize(80, -1);
 		strLatitude.setLabel("");
 		strLatitude.setText("Latitude");
 		strLatitude.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-		((Form)screen).append(strLatitude);
+		this.append(strLatitude);
 		strLongitude.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		strLongitude.setPreferredSize(80, -1);
 		strLongitude.setLabel("");
 		strLongitude.setText("Longitude");
 		strLongitude.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-		((Form)screen).append(strLongitude);
+		this.append(strLongitude);
 		strLatitudeData.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
 		strLatitudeData.setPreferredSize(80, -1);
 		strLatitudeData.setLabel("");
 		strLatitudeData.setText("Waiting...");
 		strLatitudeData.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-		((Form)screen).append(strLatitudeData);
+		this.append(strLatitudeData);
 		strLongitudeData.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		strLongitudeData.setPreferredSize(80, -1);
 		strLongitudeData.setLabel("");
 		strLongitudeData.setText("Waiting...");
 		strLongitudeData.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-		((Form)screen).append(strLongitudeData);
+		this.append(strLongitudeData);
 		spacer1.setPreferredSize(10, 10);
 		spacer1.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
-		((Form)screen).append(spacer1);
+		this.append(spacer1);
 		strFromUser.setText("Last alert:  ");
 		strFromUser.setLabel("");
 		strFromUser.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
 		strFromUser.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-		((Form)screen).append(strFromUser);
+		this.append(strFromUser);
 		strFromUserData.setText("User");
 		strFromUserData.setLabel("");
 		strFromUserData.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		strFromUserData.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-		((Form)screen).append(strFromUserData);
+		this.append(strFromUserData);
 		strDistance.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
 		strDistance.setLabel("");
 		strDistance.setText("From:  ");
 		strDistance.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
-		((Form)screen).append(strDistance);
+		this.append(strDistance);
 		strDistanceData.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		strDistanceData.setLabel("");
 		strDistanceData.setText("  x meters");
 		strDistanceData.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL));
-		((Form)screen).append(strDistanceData);
+		this.append(strDistanceData);
 		spacer2.setPreferredSize(10, 10);
 		spacer2.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_BEFORE | Item.LAYOUT_2);
-		((Form)screen).append(spacer2);
+		this.append(spacer2);
 		strAlert.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		strAlert.setLabel("");
 		strAlert.setText("This is the alert message.");
 		strAlert.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_ITALIC, Font.SIZE_SMALL));
 		strAlert.setPreferredSize(-1, -1);
-		((Form)screen).append(strAlert);
-		screen.addCommand(cmdConnect);
-		screen.addCommand(cmdDisconnect);
-		screen.addCommand(cmdMap);
-		screen.addCommand(cmdAcercaDe);
-		screen.addCommand(cmdExit);		
-	}
-	
-	public Displayable getScreen () 
-	{
-		return screen;
+		this.append(strAlert);
+		this.addCommand(cmdConnect);
+		this.addCommand(cmdDisconnect);
+		this.addCommand(cmdMap);
+		this.addCommand(cmdSettings);
+		this.addCommand(cmdAbout);
+		this.addCommand(cmdExit);		
+		timer.schedule(uiTimerTask, 0, 2000);
 	}
 	
 	public void commandAction(Command command, Displayable displayable)
@@ -221,7 +227,12 @@ public class MainFormUI extends Form implements CommandListener
 		}
 		else if(command == cmdExitMap)
 		{
-			HipoqihMIDlet.getDisplay().setCurrent(this.getScreen());
+			HipoqihMIDlet.getDisplay().setCurrent(this);
+		}
+		else if (command == cmdSettings)
+		{
+			SettingsFormUI set = new SettingsFormUI(this);
+			HipoqihMIDlet.getDisplay().setCurrent(set);
 		}
     }
 	
@@ -325,8 +336,8 @@ public class MainFormUI extends Form implements CommandListener
 		}
 		else
 		{
-			strLatitudeData.setText("Unavailable");
-			strLongitudeData.setText("Unavailable");
+			strLatitudeData.setText("Waiting...");
+			strLongitudeData.setText("Waiting...");
 		}
 	}
 	
@@ -359,8 +370,8 @@ public class MainFormUI extends Form implements CommandListener
     		}
     		else
     		{
-    			strLatitudeData.setText("Unavailable");
-    			strLongitudeData.setText("Unavailable");
+    			strLatitudeData.setText("Waiting...");
+    			strLongitudeData.setText("Waiting...");
     		}
     	}
     }
