@@ -36,10 +36,6 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
 			// Initialize any exisitng security info
 			// that might be stored in RMS stores.
 			this.loadConfiguration();
-			
-			// Other methods might use static secuirty info
-			// without init UpdateToken object first.
-//			(new MainFormUI()).prepareScreen();
 	    } 
 		catch (Exception e) 
 	    {
