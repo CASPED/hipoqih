@@ -41,7 +41,7 @@ public class SettingsFormUI extends Form implements CommandListener
 			try
 			{
 				Tools.updateRecord(RecordTypes.USER, State.user);
-				Tools.updateRecord(RecordTypes.USER, State.user);
+				Tools.updateRecord(RecordTypes.PASSWORD, State.password);
 			}
 			catch(RecordStoreException rse)
 			{
