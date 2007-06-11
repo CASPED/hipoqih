@@ -28,10 +28,10 @@ public class HipoWeb
 			System.out.println("WebReg CODIGO: " + State.secureId);
 			if (State.secureId.equals("ERROR"))
 			{
-				return WebResult.ERROR_CODIGO;
+				return WebResult.CODE_ERROR;
 			}
 			State.connected = true;
-			result = WebResult.OK_CODIGO;
+			result = WebResult.CODE_OK;
 		}
 		
 		if (messageType.equals("AVISO"))
@@ -39,7 +39,7 @@ public class HipoWeb
 			System.out.println("WebReg AVIS: " + messages[1]);
 			if (messages.length != 8)
 			{
-				return WebResult.ERROR_AVISO;
+				return WebResult.ALERT_ERROR;
 			}
 			
 			HipoAlert.Text = messages[1];
@@ -49,7 +49,7 @@ public class HipoWeb
 			HipoAlert.Distance = messages[5];
 			HipoAlert.Login = messages[6];
 			HipoAlert.IsPositional = messages[7].equals("S");
-			result = WebResult.OK_AVISO;
+			result = WebResult.ALERT_OK;
 			
 		}
 		
