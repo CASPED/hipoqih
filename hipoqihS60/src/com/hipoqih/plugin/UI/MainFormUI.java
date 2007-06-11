@@ -196,34 +196,7 @@ public class MainFormUI extends Form implements CommandListener
 		}
 		else if (command == cmdMap)
 		{
-			if (strLatitudeData.getText().trim().length() == 0 || strLongitudeData.getText().trim().length() == 0)
-			{
-				Alert alertScreen = new Alert("Error");
-				alertScreen.setString("There are no position coordinates");
-				alertScreen.setTimeout(Alert.FOREVER);
-				HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
- 			}
-			try
-			{
-				Form form = new Form("Map");
-				int width = form.getWidth();
-				int height = form.getHeight();
-				Image image = getMap(height, width);
-				form.append(image);
-				form.addCommand(cmdExitMap);
-				form.setCommandListener(this);
-				HipoqihMIDlet.getDisplay().setCurrent(form);
-			}
-			catch(IOException ioe)
-			{
-				System.out.println(ioe.getMessage());
-				ioe.printStackTrace();
-			}
-			catch(Exception ex)
-			{
-				System.out.println(ex.getMessage());
-				ex.printStackTrace();
-			}
+			showMap();
 		}
 		else if(command == cmdExitMap)
 		{
@@ -243,6 +216,37 @@ public class MainFormUI extends Form implements CommandListener
 		gpsConnected = connected;
 	}
 	
+	private void showMap()
+	{
+		if (strLatitudeData.getText().trim().length() == 0 || strLongitudeData.getText().trim().length() == 0)
+		{
+			Alert alertScreen = new Alert("Error");
+			alertScreen.setString("There are no position coordinates");
+			alertScreen.setTimeout(Alert.FOREVER);
+			HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
+			}
+		try
+		{
+			Form form = new Form("Map");
+			int width = form.getWidth();
+			int height = form.getHeight();
+			Image image = getMap(height, width);
+			form.append(image);
+			form.addCommand(cmdExitMap);
+			form.setCommandListener(this);
+			HipoqihMIDlet.getDisplay().setCurrent(form);
+		}
+		catch(IOException ioe)
+		{
+			System.out.println(ioe.getMessage());
+			ioe.printStackTrace();
+		}
+		catch(Exception ex)
+		{
+			System.out.println(ex.getMessage());
+			ex.printStackTrace();
+		}	}
+	
 	private void connectToWeb()
 	{
 		try
@@ -251,15 +255,15 @@ public class MainFormUI extends Form implements CommandListener
 			switch(resultado)
 			{
 			case WebResult.BAD_RESPONSE:
-			case WebResult.ERROR_AVISO:
-			case WebResult.ERROR_CODIGO:
+			case WebResult.ALERT_ERROR:
+			case WebResult.CODE_ERROR:
 			case WebResult.UNKNOWN_MESSAGE_TYPE:
 				Alert alertScreen = new Alert("Error");
 				alertScreen.setString("There was an error accessing hipoqih");
 				alertScreen.setTimeout(Alert.FOREVER);
 				HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
 				break;
-			case WebResult.OK_AVISO:
+			case WebResult.ALERT_OK:
 				if (HipoAlert.IsPositional)
 				{
 					Date hoy = new Date();
@@ -277,7 +281,7 @@ public class MainFormUI extends Form implements CommandListener
 					strAlert.setText(textoAviso);
 				}
 				break;
-			case WebResult.OK_CODIGO:
+			case WebResult.CODE_OK:
 				break;
 			}
 		}
