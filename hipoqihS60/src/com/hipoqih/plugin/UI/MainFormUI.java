@@ -252,13 +252,24 @@ public class MainFormUI extends Form implements CommandListener
 		try
 		{
 			int resultado =  HipoWeb.sendWebReg(State.user, State.password);
+			Alert alertScreen;
 			switch(resultado)
 			{
 			case WebResult.BAD_RESPONSE:
 			case WebResult.ALERT_ERROR:
+				alertScreen = new Alert("Error");
+				alertScreen.setString("There was an error accessing hipoqih");
+				alertScreen.setTimeout(Alert.FOREVER);
+				HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
+				break;
 			case WebResult.CODE_ERROR:
+				alertScreen = new Alert("Error");
+				alertScreen.setString("Wrong user or password");
+				alertScreen.setTimeout(Alert.FOREVER);
+				HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
+				break;
 			case WebResult.UNKNOWN_MESSAGE_TYPE:
-				Alert alertScreen = new Alert("Error");
+				alertScreen = new Alert("Error");
 				alertScreen.setString("There was an error accessing hipoqih");
 				alertScreen.setTimeout(Alert.FOREVER);
 				HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
