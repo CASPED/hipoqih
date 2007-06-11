@@ -156,14 +156,15 @@ public class MainFormUI extends Form implements CommandListener
 			{
 				try
 				{
-					System.out.println("cmdConnect->not connected");
-					connectToWeb();
-					uiTimerTask.cancel();
-					webTimerTask = new WebTimerTask();
-					timer.schedule(webTimerTask, 0, 2000);
-					isConnected = true;
-					strComStatus.setText("Connected");
-					img.setImage(imageOn);
+					if (connectToWeb())
+					{
+						uiTimerTask.cancel();
+						webTimerTask = new WebTimerTask();
+						timer.schedule(webTimerTask, 0, 2000);
+						isConnected = true;
+						strComStatus.setText("Connected");
+						img.setImage(imageOn);
+					}
 				}
 				catch(Exception ex)
 				{
@@ -247,13 +248,14 @@ public class MainFormUI extends Form implements CommandListener
 			ex.printStackTrace();
 		}	}
 	
-	private void connectToWeb()
+	private boolean connectToWeb()
 	{
+		boolean result = false; 
 		try
 		{
-			int resultado =  HipoWeb.sendWebReg(State.user, State.password);
+			int webResult =  HipoWeb.sendWebReg(State.user, State.password);
 			Alert alertScreen;
-			switch(resultado)
+			switch(webResult)
 			{
 			case WebResult.BAD_RESPONSE:
 			case WebResult.ALERT_ERROR:
@@ -291,8 +293,10 @@ public class MainFormUI extends Form implements CommandListener
 					strDistanceData.setText(HipoAlert.Distance +  " meters");
 					strAlert.setText(textoAviso);
 				}
+				result = true;
 				break;
 			case WebResult.CODE_OK:
+				result = true;
 				break;
 			}
 		}
@@ -300,6 +304,8 @@ public class MainFormUI extends Form implements CommandListener
 		{
 			strAlert.setText("error");
 		}
+		
+		return result;
 	}
 	
 	class WebTimerTask extends TimerTask
