@@ -1,4 +1,4 @@
-package com.hipoqih.plugin;
+package com.hipoqih.plugin.s60_3rd;
 
 
 
