@@ -4,6 +4,7 @@ import javax.microedition.lcdui.*;
 import javax.microedition.rms.RecordStoreException;
 
 import com.hipoqih.plugin.*;
+import com.hipoqih.plugin.s60_3rd.*;
 
 public class SettingsFormUI extends Form implements CommandListener 
 {
