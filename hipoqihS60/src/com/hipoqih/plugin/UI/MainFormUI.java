@@ -5,6 +5,7 @@ import java.util.*;
 import javax.microedition.lcdui.*;
 import com.hipoqih.plugin.Web.*;
 import com.hipoqih.plugin.*;
+import com.hipoqih.plugin.s60_3rd.*;
 
 public class MainFormUI extends Form implements CommandListener
 {

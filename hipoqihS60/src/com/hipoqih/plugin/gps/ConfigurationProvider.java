@@ -33,10 +33,9 @@
 // intellectual property rights is granted herein.
 package com.hipoqih.plugin.gps;
 
+import com.hipoqih.plugin.s60_3rd.*;
 import javax.microedition.location.*;
 import javax.microedition.lcdui.*;
-
-import com.hipoqih.plugin.HipoqihMIDlet;
 
 public class ConfigurationProvider 
 {

@@ -1,7 +1,7 @@
 package com.hipoqih.plugin.s60_3rd;
 
 
-
+import com.hipoqih.plugin.*;
 import javax.microedition.midlet.*;
 import javax.microedition.rms.*;
 import javax.microedition.lcdui.*;
