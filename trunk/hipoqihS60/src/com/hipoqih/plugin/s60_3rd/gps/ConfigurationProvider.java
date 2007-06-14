@@ -31,7 +31,7 @@
 // incorporated into the programs developed by the Licensee. No other
 // license, express or implied, by estoppel or otherwise, to any other
 // intellectual property rights is granted herein.
-package com.hipoqih.plugin.gps;
+package com.hipoqih.plugin.s60_3rd.gps;
 
 import com.hipoqih.plugin.s60_3rd.*;
 import javax.microedition.location.*;
