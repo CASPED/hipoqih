@@ -3,12 +3,8 @@ package com.hipoqih.plugin.UI;
 import java.io.*;
 import java.util.*;
 import javax.microedition.lcdui.*;
-import javax.microedition.midlet.MIDlet;
-
 import com.hipoqih.plugin.Web.*;
 import com.hipoqih.plugin.*;
-import com.hipoqih.plugin.s60_2nd.*;
-//import com.hipoqih.plugin.s60_3rd.*;
 
 public class MainFormUI extends Form implements CommandListener
 {
