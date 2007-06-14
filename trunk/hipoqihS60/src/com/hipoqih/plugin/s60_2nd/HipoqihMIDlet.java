@@ -1,6 +1,9 @@
 package com.hipoqih.plugin.s60_2nd;
 
 import com.hipoqih.plugin.*;
+import com.hipoqih.plugin.s60_2nd.gps.BluetoothConnection;
+import com.hipoqih.plugin.s60_2nd.gps.GPS;
+
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
 
@@ -12,6 +15,7 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 {
 	private Command exitCommand;
 	private Command goCommand;
+	private Command deviceSelection;
     private final static String UUID = "40385A09EF46BCC09AAD8300CFAF611D";
 
 	public HipoqihMIDlet () throws Exception 
@@ -34,12 +38,12 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 	      e.printStackTrace();
 	    }
 
-/*	    SplashScreen splash = new SplashScreen ();
+	    SplashScreen splash = new SplashScreen ();
 	    splash.addCommand(exitCommand);
 	    splash.addCommand(goCommand);
 	    splash.setFullScreenMode(true);
 	    splash.setCommandListener( (CommandListener) this);
-	    display.setCurrent(splash);*/
+	    State.display.setCurrent(splash);
 	}
 	
 	public void exit()
@@ -83,6 +87,13 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 	    }
 		else if (command == goCommand) 
 		{
+			BluetoothConnection bt = new BluetoothConnection();
+			bt.searchDevices();
+			List listDevices = bt.getDevicesList();
+			deviceSelection = new Command("Select", Command.SCREEN, 3);
+			listDevices.addCommand(deviceSelection);
+			listDevices.setCommandListener(this);
+	        State.display.setCurrent(listDevices);
 			
 		}		
 	}
