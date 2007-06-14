@@ -2,6 +2,7 @@ package com.hipoqih.plugin;
  
 import java.util.Hashtable;
 
+import javax.microedition.lcdui.Display;
 import javax.microedition.rms.RecordEnumeration;
 import javax.microedition.rms.RecordStore;
 import javax.microedition.rms.RecordStoreException;
@@ -29,6 +30,7 @@ public class State
 	public static Hashtable recordMaps = new Hashtable();
 	public static int zoom = 10000;
 	public static String secureId = "";
+	public static Display display = null;
 
 	private State() {}
 	

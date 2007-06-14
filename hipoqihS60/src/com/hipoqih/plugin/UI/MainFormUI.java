@@ -3,13 +3,16 @@ package com.hipoqih.plugin.UI;
 import java.io.*;
 import java.util.*;
 import javax.microedition.lcdui.*;
+import javax.microedition.midlet.MIDlet;
+
 import com.hipoqih.plugin.Web.*;
 import com.hipoqih.plugin.*;
-import com.hipoqih.plugin.s60_3rd.*;
+import com.hipoqih.plugin.s60_2nd.*;
+//import com.hipoqih.plugin.s60_3rd.*;
 
 public class MainFormUI extends Form implements CommandListener
 {
-	public static HipoqihMIDlet m;
+	public static MIDletExiter m;
 	javax.microedition.lcdui.StringItem strComStatus = new StringItem("", "", StringItem.PLAIN);
 	javax.microedition.lcdui.ImageItem img = new ImageItem("", null, ImageItem.LAYOUT_DEFAULT, "", ImageItem.PLAIN);
 	javax.microedition.lcdui.Image imageOn;
@@ -148,8 +151,7 @@ public class MainFormUI extends Form implements CommandListener
 		// EXIT command
 		if (command == cmdExit)
 		{
-			m.destroyApp(false);
-			m.notifyDestroyed();
+			m.exit();
 		}		
 		else if ( command == cmdConnect )
 		{
@@ -202,12 +204,12 @@ public class MainFormUI extends Form implements CommandListener
 		}
 		else if(command == cmdExitMap)
 		{
-			HipoqihMIDlet.getDisplay().setCurrent(this);
+			State.display.setCurrent(this);
 		}
 		else if (command == cmdSettings)
 		{
 			SettingsFormUI set = new SettingsFormUI(this);
-			HipoqihMIDlet.getDisplay().setCurrent(set);
+			State.display.setCurrent(set);
 		}
     }
 	
@@ -225,7 +227,7 @@ public class MainFormUI extends Form implements CommandListener
 			Alert alertScreen = new Alert("Error");
 			alertScreen.setString("There are no position coordinates");
 			alertScreen.setTimeout(Alert.FOREVER);
-			HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
+			State.display.setCurrent(alertScreen);
 			}
 		try
 		{
@@ -236,7 +238,7 @@ public class MainFormUI extends Form implements CommandListener
 			form.append(image);
 			form.addCommand(cmdExitMap);
 			form.setCommandListener(this);
-			HipoqihMIDlet.getDisplay().setCurrent(form);
+			State.display.setCurrent(form);
 		}
 		catch(IOException ioe)
 		{
@@ -263,19 +265,19 @@ public class MainFormUI extends Form implements CommandListener
 				alertScreen = new Alert("Error");
 				alertScreen.setString("There was an error accessing hipoqih");
 				alertScreen.setTimeout(Alert.FOREVER);
-				HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
+				State.display.setCurrent(alertScreen);
 				break;
 			case WebResult.CODE_ERROR:
 				alertScreen = new Alert("Error");
 				alertScreen.setString("Wrong user or password");
 				alertScreen.setTimeout(Alert.FOREVER);
-				HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
+				State.display.setCurrent(alertScreen);
 				break;
 			case WebResult.UNKNOWN_MESSAGE_TYPE:
 				alertScreen = new Alert("Error");
 				alertScreen.setString("There was an error accessing hipoqih");
 				alertScreen.setTimeout(Alert.FOREVER);
-				HipoqihMIDlet.getDisplay().setCurrent(alertScreen);
+				State.display.setCurrent(alertScreen);
 				break;
 			case WebResult.ALERT_OK:
 				if (HipoAlert.IsPositional)
