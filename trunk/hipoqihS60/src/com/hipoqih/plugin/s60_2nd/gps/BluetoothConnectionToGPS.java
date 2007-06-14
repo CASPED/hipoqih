@@ -1,10 +1,12 @@
 package com.hipoqih.plugin.s60_2nd.gps;
 
-
+//import com.hipoqih.plugin.LogScreen;
 import javax.bluetooth.*;
 import java.util.Vector;
 import javax.microedition.lcdui.*;
 import javax.microedition.rms.RecordStoreException;
+
+import com.hipoqih.plugin.State;
 
 // - Connection to a new device :
 //   searchDevices method must be called.
@@ -84,7 +86,7 @@ class BluetoothConnectionToGPS implements DiscoveryListener, Runnable {
         url = null;
         devices.removeAllElements();
         listFindDevice.deleteAll();
-        listFindDevice = new List("Devices find", List.EXCLUSIVE);
+        listFindDevice = new List("Devices found", List.EXCLUSIVE);
         lastDevice.deleteAll();
         idService = 0;
         Thread thread = new Thread(this);
@@ -93,7 +95,8 @@ class BluetoothConnectionToGPS implements DiscoveryListener, Runnable {
 
     //called when the device is choosed from the list. After, the service is connected automatically.
     // param i number of the index from the list of devices.
-    public void connectDevice(int i) {
+    public void connectDevice(int i) 
+    {
         if (searchDevice)
             //cancel research of device
             mDiscoveryAgent.cancelInquiry(this);
@@ -272,6 +275,8 @@ class BluetoothConnectionToGPS implements DiscoveryListener, Runnable {
         Debug.setDebug("Service discovered : " + serviceRecords[0], Debug.DETAIL);
         //take the URL when the service is discovered
         url = serviceRecords[0].getConnectionURL(ServiceRecord.NOAUTHENTICATE_NOENCRYPT, true);
+        url = url.substring(0, 22);
+        State.addToLog("url: " + url);
     }
 
     //the service search is terminated.
@@ -349,6 +354,7 @@ class BluetoothConnectionToGPS implements DiscoveryListener, Runnable {
                 long time = System.currentTimeMillis() / 1000;
                 boolean stop = false;
                 while (!deviceFind && !stop) {
+                	//State.addToLog("timeSearchDevice:" + Integer.toString(timeSearchDevice));
                     //When the time by default or setting is done, the device search is stopping
                     if ((System.currentTimeMillis() / 1000 - time) > timeSearchDevice) {
                         serviceNotConnected = true;
@@ -356,7 +362,7 @@ class BluetoothConnectionToGPS implements DiscoveryListener, Runnable {
                     }
                 }
                 //Thhread must be synchronized when the Bluetooth device is selected
-                if (!stop) {
+                if (stop) {
                     synchronized (this) {
                         try {
                             wait();
