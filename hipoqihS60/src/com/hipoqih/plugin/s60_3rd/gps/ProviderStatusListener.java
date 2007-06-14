@@ -1,4 +1,5 @@
-package com.hipoqih.plugin.gps;
+package com.hipoqih.plugin.s60_3rd.gps;
+
 
 public interface ProviderStatusListener
 {
