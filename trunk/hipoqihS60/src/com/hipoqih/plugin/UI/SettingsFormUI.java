@@ -4,7 +4,8 @@ import javax.microedition.lcdui.*;
 import javax.microedition.rms.RecordStoreException;
 
 import com.hipoqih.plugin.*;
-import com.hipoqih.plugin.s60_3rd.*;
+import com.hipoqih.plugin.s60_2nd.*;
+//import com.hipoqih.plugin.s60_3rd.*;
 
 public class SettingsFormUI extends Form implements CommandListener 
 {
@@ -50,11 +51,11 @@ public class SettingsFormUI extends Form implements CommandListener
 				alertScreen.setString("There was an error storing the data");
 				alertScreen.setTimeout(Alert.FOREVER);
 			}
-			HipoqihMIDlet.getDisplay().setCurrent(mainForm);
+			State.display.setCurrent(mainForm);
 		}
 		if (command == cmdCancel)
 		{
-			HipoqihMIDlet.getDisplay().setCurrent(mainForm);
+			State.display.setCurrent(mainForm);
 		}
     }
 }
