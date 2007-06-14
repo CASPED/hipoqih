@@ -29,7 +29,9 @@ public class MainFormUI extends Form implements CommandListener
 	javax.microedition.lcdui.Command cmdDisconnect = new Command("Disconnect", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdMap = new Command("Map", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdSettings = new Command("Settings", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdShowLog = new Command("Log", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdExitMap = new Command("Exit", Command.SCREEN, 1);
+	
 	private boolean isConnected = false;
 	static public final javax.microedition.lcdui.Command cmdExit = new Command("Exit", Command.EXIT, 0);
 	javax.microedition.lcdui.Image image1;
@@ -137,6 +139,7 @@ public class MainFormUI extends Form implements CommandListener
 		this.addCommand(cmdDisconnect);
 		this.addCommand(cmdMap);
 		this.addCommand(cmdSettings);
+		this.addCommand(cmdShowLog);
 		this.addCommand(cmdAbout);
 		this.addCommand(cmdExit);		
 		timer.schedule(uiTimerTask, 0, 2000);
@@ -206,6 +209,10 @@ public class MainFormUI extends Form implements CommandListener
 		{
 			SettingsFormUI set = new SettingsFormUI(this);
 			State.display.setCurrent(set);
+		}
+		else if (command == cmdShowLog)
+		{
+			strAlert.setText(State.getLog());
 		}
     }
 	

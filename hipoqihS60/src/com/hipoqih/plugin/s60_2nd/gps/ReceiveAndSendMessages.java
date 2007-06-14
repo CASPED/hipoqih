@@ -1,5 +1,6 @@
 package com.hipoqih.plugin.s60_2nd.gps;
 
+import com.hipoqih.plugin.State;
 import javax.microedition.io.StreamConnection;
 import javax.microedition.io.Connector;
 import java.io.*;
@@ -104,9 +105,22 @@ class ReceiveAndSendMessages implements Runnable {
                 //URL have to exist
                 if (url != null) {
                     if (!sendNMEAmessage || firstConnection)
+                    {
                         //connector to the gps device
-                        conn = (StreamConnection) Connector.open(url, Connector.READ_WRITE);
-                    if (conn != null) {
+                    	try
+                    	{
+                    		conn = (StreamConnection) Connector.open(url, Connector.READ);
+                    	}
+                    	catch(Exception ex)
+                    	{
+                    		//State.addToLog(ex.getMessage());
+                    		State.addToLog("Exception");
+                    	}
+                    	
+                    }
+                    if (conn != null) 
+                    {
+                    	State.addToLog("Dentro del if conn");
                         firstConnection = false;
                         sendNMEAmessage = false;
                         is = new InputStreamReader(conn.openInputStream());
@@ -119,6 +133,7 @@ class ReceiveAndSendMessages implements Runnable {
                             //take character after character
                             i = is.read();
                             c = (char) i;
+                            State.addToLog(String.valueOf(c));
                             //i = 36 => $. $ is the start of the NMEA sentence
                             if (i == 36) {
                                 firstMessage = false;
@@ -134,6 +149,7 @@ class ReceiveAndSendMessages implements Runnable {
                         } while ((i != -1) && (!mEndnow) && (!sendNMEAmessage));
                         //close InputStreamReader
                         is.close();
+                        State.addToLog(s.toString());
                         // to send A NMEA or SIRF sentence
                         if (!mEndnow && sendNMEAmessage) {
                             try {
@@ -162,7 +178,10 @@ class ReceiveAndSendMessages implements Runnable {
                     }
                     //if no first connector
                     else
+                    {
+                    	State.addToLog("conn == null");
                         isConnected = false;
+                    }
                 }
                 //if no URL
                 else

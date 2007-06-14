@@ -1,7 +1,9 @@
 package com.hipoqih.plugin.s60_2nd;
 
 import com.hipoqih.plugin.*;
+import com.hipoqih.plugin.UI.MainFormUI;
 import com.hipoqih.plugin.s60_2nd.gps.BluetoothConnection;
+import com.hipoqih.plugin.s60_2nd.gps.Coordinates;
 import com.hipoqih.plugin.s60_2nd.gps.GPS;
 
 import javax.microedition.midlet.*;
@@ -11,12 +13,16 @@ import javax.microedition.lcdui.*;
  * @author Xavi
  *
  */
-public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExiter
+public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExiter, Runnable
 {
 	private Command exitCommand;
 	private Command goCommand;
 	private Command deviceSelection;
-    private final static String UUID = "40385A09EF46BCC09AAD8300CFAF611D";
+	private MainFormUI mainFormUI = null;
+	private BluetoothConnection bt = new BluetoothConnection();
+	private GPS gps = new GPS(bt); 
+	private List listDevices = null;
+	Thread thread = new Thread(this);
 
 	public HipoqihMIDlet () throws Exception 
 	{ 
@@ -37,7 +43,7 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 	    {
 	      e.printStackTrace();
 	    }
-
+		
 	    SplashScreen splash = new SplashScreen ();
 	    splash.addCommand(exitCommand);
 	    splash.addCommand(goCommand);
@@ -75,9 +81,6 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 		}
 	}
 
-	/**
-	 * 
-	 */
 	public void commandAction(Command command, Displayable screen) 
 	{
 		if (command == exitCommand) 
@@ -87,19 +90,29 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 	    }
 		else if (command == goCommand) 
 		{
-			BluetoothConnection bt = new BluetoothConnection();
 			bt.searchDevices();
-			List listDevices = bt.getDevicesList();
+			listDevices = bt.getDevicesList();
 			deviceSelection = new Command("Select", Command.SCREEN, 3);
 			listDevices.addCommand(deviceSelection);
 			listDevices.setCommandListener(this);
 	        State.display.setCurrent(listDevices);
-			
 		}		
+		else if (command == deviceSelection)
+		{
+			MainFormUI.m = this;
+	       	mainFormUI = new MainFormUI();
+	       	bt.connectDevice(listDevices.getSelectedIndex());
+	       	thread.start();
+			State.display.setCurrent(mainFormUI);
+		}
 	}
 	
-	public void serviceSearchCompleted(int transID, int respCode)
+	public void run()
 	{
-		
+		while(true)
+		{
+			Coordinates coor = gps.getCoordinates();
+			mainFormUI.setLocation(coor.getLatitude(), coor.getLongitude(), true);
+		}
 	}
 }

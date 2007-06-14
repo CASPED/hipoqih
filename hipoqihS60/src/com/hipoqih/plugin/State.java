@@ -31,12 +31,28 @@ public class State
 	public static int zoom = 10000;
 	public static String secureId = "";
 	public static Display display = null;
+	private static StringBuffer log = new StringBuffer("");
 
 	private State() {}
 	
 	public static State getInstance()
 	{
 		return INSTANCE;
+	}
+	
+	public synchronized static void addToLog(String text)
+	{
+		log.append(text + "\n");
+	}
+	
+	public static String getLog()
+	{
+		return log.toString();
+	}
+	
+	public static void resetLog()
+	{
+		log.delete(0, log.length() - 1);
 	}
 	
 	// Load stored state
