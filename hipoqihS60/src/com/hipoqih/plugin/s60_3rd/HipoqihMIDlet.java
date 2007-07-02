@@ -3,11 +3,10 @@ package com.hipoqih.plugin.s60_3rd;
 
 import com.hipoqih.plugin.*;
 import javax.microedition.midlet.*;
-import javax.microedition.rms.*;
 import javax.microedition.lcdui.*;
 
 import com.hipoqih.plugin.UI.*;
-import com.hipoqih.plugin.gps.*;
+import com.hipoqih.plugin.s60_3rd.gps.*;
 
 public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderStatusListener, MIDletExiter
 {
