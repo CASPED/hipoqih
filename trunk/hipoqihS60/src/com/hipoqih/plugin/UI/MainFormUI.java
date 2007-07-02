@@ -106,7 +106,7 @@ public class MainFormUI extends Form implements CommandListener
 		spacer1.setPreferredSize(10, 10);
 		spacer1.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_NEWLINE_AFTER | Item.LAYOUT_2);
 		this.append(spacer1);
-		strFromUser.setText("Last alert:  ");
+		strFromUser.setText("");
 		strFromUser.setLabel("");
 		strFromUser.setLayout(Item.LAYOUT_LEFT | Item.LAYOUT_TOP | Item.LAYOUT_2);
 		strFromUser.setFont(Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL));
