@@ -16,4 +16,6 @@ public class RecordTypes
 	public static final int ALERTHEIGHT = 12;
 	public static final int ALERTTOP = 13;
 	public static final int ALERTLEFT = 14;
+	public static final int CONNECTIONPERIOD = 15;
+	public static final int count = 15;	// Used to check if all record types are already stored
 }

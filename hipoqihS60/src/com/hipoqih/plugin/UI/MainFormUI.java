@@ -162,7 +162,7 @@ public class MainFormUI extends Form implements CommandListener
 					{
 						uiTimerTask.cancel();
 						webTimerTask = new WebTimerTask();
-						timer.schedule(webTimerTask, 0, 2000);
+						timer.schedule(webTimerTask, 0, State.connectionPeriod);
 						isConnected = true;
 						strComStatus.setText("Connected");
 						img.setImage(imageOn);

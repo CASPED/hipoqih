@@ -29,6 +29,7 @@ public class State
 	public static RecordStore recordStore;
 	public static Hashtable recordMaps = new Hashtable();
 	public static int zoom = 10000;
+	public static int connectionPeriod = 2000;
 	public static String secureId = "";
 	public static Display display = null;
 	private static StringBuffer log = new StringBuffer("");
@@ -60,7 +61,7 @@ public class State
 	{
 		State.recordStore = RecordStore.openRecordStore("hipoqih", true);
 		
-		if (State.recordStore.getNumRecords() == 0)
+		if (State.recordStore.getNumRecords() < RecordTypes.count)
 		{
 			createConfiguration(State.recordStore);
 		}
@@ -123,6 +124,9 @@ public class State
 		case RecordTypes.USER:
 			State.user = new String(record, 1, record.length - 1);
 			break;
+		case RecordTypes.CONNECTIONPERIOD:
+			State.connectionPeriod = bytesToInteger(record);
+			break;
 		}
 	}
 	
@@ -167,6 +171,7 @@ public class State
 		String urlMapAlert = State.urlMapAlert ? "1" : "0";
 		createRecord(recordStore, urlMapAlert, RecordTypes.URLMAPALERT);
 		createRecord(recordStore, State.user, RecordTypes.USER);
+		createRecord(recordStore, Integer.toString(State.connectionPeriod), RecordTypes.CONNECTIONPERIOD);
 	}
 	
 	private void createRecord(RecordStore recordStore, String data, int recordType)
