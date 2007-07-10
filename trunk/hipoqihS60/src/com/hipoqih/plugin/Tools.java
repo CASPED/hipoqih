@@ -29,6 +29,7 @@ public class Tools {
 	public static void updateRecord (int recordType, String data) throws RecordStoreException
 	{
 		Integer id = (Integer)State.recordMaps.get(new Integer(recordType));
+
 		int recordLength = 1;
 		byte[] dataBytes = data.getBytes();
 		
