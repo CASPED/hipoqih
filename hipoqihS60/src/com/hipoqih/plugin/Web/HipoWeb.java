@@ -23,9 +23,13 @@ import com.hipoqih.plugin.*;
 
 public class HipoWeb
 {
+	private static final String urlConnect = "http://www.hipoqih.com/alta.php";
+	private static final String urlDisconnect = "http://www.hipoqih.com/baja.php";
+	private static final String urlPosition = "http://www.hipoqih.com/oreja.php";
+
 	public static int sendWebReg(String user, String pass) throws IOException
 	{
-		String url = "http://www.hipoqih.com/alta.php?user="+user+"&pass="+pass;
+		String url = urlConnect + "?user="+user+"&pass="+pass;
 		String message = sendWebRequestString(url);
 		int result = WebResult.UNKNOWN_MESSAGE_TYPE;
 		
@@ -167,13 +171,13 @@ public class HipoWeb
 	
 	public static void sendWebPos(String lat, String lon) throws IOException
 	{
-		String url = "http://www.hipoqih.com/oreja.php?iduser=" + State.secureId + "&lat=" + lat + "&lon=" + lon;
+		String url = urlPosition + "?iduser=" + State.secureId + "&lat=" + lat + "&lon=" + lon;
 		sendWebRequestString(url);
 	}
 	
 	public static void sendWebDisconnection() throws IOException
 	{
-		String url = "http://www.hipoqih.com/baja.php?iduser=" + State.secureId;
+		String url = urlDisconnect + "?iduser=" + State.secureId;
 		sendWebRequestString(url);
 	}
 	
