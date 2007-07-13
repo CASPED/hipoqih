@@ -198,6 +198,7 @@ public class MainFormUI extends Form implements CommandListener
 				try
 				{
 					isConnected = false;
+					HipoWeb.sendWebDisconnection();
 					strComStatus.setText("Disconnected");
 					img.setImage(imageOff);
 					webTimerTask.cancel();

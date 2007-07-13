@@ -171,6 +171,12 @@ public class HipoWeb
 		sendWebRequestString(url);
 	}
 	
+	public static void sendWebDisconnection() throws IOException
+	{
+		String url = "http://www.hipoqih.com/baja.php?iduser=" + State.secureId;
+		sendWebRequestString(url);
+	}
+	
 	private static String[] parseMessage(String mensaje)
 	{
 		// Temporalmente almacenaremos los mensajes en un vector 
