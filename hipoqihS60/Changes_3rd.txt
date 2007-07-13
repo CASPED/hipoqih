@@ -1,0 +1,2 @@
+Version 0.3.3
+	- FIXED: Added web request to erase last position at disconnection.
