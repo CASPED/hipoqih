@@ -15,12 +15,17 @@
 package com.hipoqih.plugin;
  
 import java.io.*;
+import java.util.*;
+
 import javax.microedition.lcdui.*;
 
 public class SplashScreen extends Canvas 
 {
-	public SplashScreen () 
+	private MIDletExiter m;
+	
+	public SplashScreen (MIDletExiter me) 
 	{
+		m = me;
 	}
 
 	public void paint (Graphics g) 
@@ -52,5 +57,10 @@ public class SplashScreen extends Canvas
 		{
 			g.drawString(e.getMessage(), w/2, h/2, Graphics.BASELINE | Graphics.HCENTER);
 		}
+	}
+	
+	public void keyPressed(int keyCode)
+	{
+		m.nextDisplay();
 	}
 }
