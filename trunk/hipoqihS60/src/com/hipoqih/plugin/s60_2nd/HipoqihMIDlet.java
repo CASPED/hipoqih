@@ -30,8 +30,6 @@ import javax.microedition.lcdui.*;
  */
 public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExiter, Runnable
 {
-	private Command exitCommand;
-	private Command goCommand;
 	private Command deviceSelection;
 	private MainFormUI mainFormUI = null;
 	private BluetoothConnection bt = new BluetoothConnection();
@@ -59,7 +57,6 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 		
 	    SplashScreen splash = new SplashScreen (this);
 	    splash.setFullScreenMode(true);
-	    splash.setCommandListener( (CommandListener) this);
 	    State.display.setCurrent(splash);
 	}
 	

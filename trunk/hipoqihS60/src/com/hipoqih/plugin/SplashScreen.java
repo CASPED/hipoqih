@@ -14,47 +14,64 @@
  * */
 package com.hipoqih.plugin;
  
+<<<<<<< .mine
+=======
 import java.io.*;
 
+>>>>>>> .r90
 import javax.microedition.lcdui.*;
 
-public class SplashScreen extends Canvas 
+public class SplashScreen extends Canvas implements Runnable
 {
 	private MIDletExiter m;
+	Image img[]=new Image[2];
+	int imgIndex = 0;
 	
 	public SplashScreen (MIDletExiter me) 
 	{
 		m = me;
+		try
+		{
+			img[0]=Image.createImage("/hipoqihSplash.PNG");
+			img[1]=Image.createImage("/hipoqihSplash2.png");
+		}
+		catch(Exception e){}
+		Thread th=new Thread(this);
+		th.start();
 	}
 
 	public void paint (Graphics g) 
 	{
-		Image splash;
 		int w = getWidth ();
 		int h = getHeight ();
 
 		try 
 		{
-			Class c = this.getClass();
-			InputStream is = c.getResourceAsStream("/hipoqihSplash.PNG");
-			ByteArrayOutputStream bos = new ByteArrayOutputStream ();
-			byte [] buf = new byte [256];
-			while (true) 
-			{
-				int rd = is.read (buf, 0, 256);
-				if (rd == -1) break;
-				bos.write (buf, 0, rd);
-			}
-			buf = bos.toByteArray ();
-			splash = Image.createImage(buf, 0, buf.length);
-			bos.close();
-			is.close();
-
-			g.drawImage(splash, w/2, h/2, Graphics.VCENTER | Graphics.HCENTER);
+			g.drawImage(img[imgIndex], w/2, h/2, Graphics.VCENTER | Graphics.HCENTER);
 		} 
 		catch (Exception e) 
 		{
 			g.drawString(e.getMessage(), w/2, h/2, Graphics.BASELINE | Graphics.HCENTER);
+		}
+		
+	}
+	
+	public void run()
+	{
+		while(true)
+		{
+			if (imgIndex == 0)
+				imgIndex = 1;
+			else
+				imgIndex = 0;
+			
+			repaint();
+			
+			try
+			{
+				Thread.sleep(500);
+			}
+			catch(Exception e){}
 		}
 	}
 	
