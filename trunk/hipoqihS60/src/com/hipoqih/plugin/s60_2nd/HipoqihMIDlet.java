@@ -42,8 +42,6 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 	public HipoqihMIDlet () throws Exception 
 	{ 
 		State.display = Display.getDisplay(this);
-		exitCommand = new Command("EXIT", Command.SCREEN, 2);
-		goCommand = new Command("GO", Command.SCREEN, 1);
 	}
 	
 	public void startApp() 
@@ -59,9 +57,7 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 	      e.printStackTrace();
 	    }
 		
-	    SplashScreen splash = new SplashScreen ();
-	    splash.addCommand(exitCommand);
-	    splash.addCommand(goCommand);
+	    SplashScreen splash = new SplashScreen (this);
 	    splash.setFullScreenMode(true);
 	    splash.setCommandListener( (CommandListener) this);
 	    State.display.setCurrent(splash);
@@ -71,6 +67,16 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 	{
 		destroyApp(false);
 	    notifyDestroyed();
+	}
+	
+	public void nextDisplay()
+	{
+		bt.searchDevices();
+		listDevices = bt.getDevicesList();
+		deviceSelection = new Command("Select", Command.SCREEN, 3);
+		listDevices.addCommand(deviceSelection);
+		listDevices.setCommandListener(this);
+        State.display.setCurrent(listDevices);
 	}
 
 	public void notifyBTProblem(String message)
@@ -98,21 +104,7 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, MIDletExit
 
 	public void commandAction(Command command, Displayable screen) 
 	{
-		if (command == exitCommand) 
-		{
-			destroyApp(false);
-			notifyDestroyed();
-	    }
-		else if (command == goCommand) 
-		{
-			bt.searchDevices();
-			listDevices = bt.getDevicesList();
-			deviceSelection = new Command("Select", Command.SCREEN, 3);
-			listDevices.addCommand(deviceSelection);
-			listDevices.setCommandListener(this);
-	        State.display.setCurrent(listDevices);
-		}		
-		else if (command == deviceSelection)
+		if (command == deviceSelection)
 		{
 			MainFormUI.m = this;
 	       	mainFormUI = new MainFormUI();
