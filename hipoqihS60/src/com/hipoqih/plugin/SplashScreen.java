@@ -15,7 +15,6 @@
 package com.hipoqih.plugin;
  
 import java.io.*;
-import java.util.*;
 
 import javax.microedition.lcdui.*;
 

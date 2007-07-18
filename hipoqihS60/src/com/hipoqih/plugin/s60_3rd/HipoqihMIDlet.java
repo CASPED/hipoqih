@@ -16,6 +16,9 @@
 package com.hipoqih.plugin.s60_3rd;
 
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.hipoqih.plugin.*;
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
@@ -23,19 +26,17 @@ import javax.microedition.lcdui.*;
 import com.hipoqih.plugin.UI.*;
 import com.hipoqih.plugin.s60_3rd.gps.*;
 
-public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderStatusListener, MIDletExiter
+public class HipoqihMIDlet extends MIDlet implements ProviderStatusListener, MIDletExiter
 {
-	private Command exitCommand;
-	private Command goCommand;
 	private static Display display;
     private Object mutex = new Object();
     private HipoqihData data = null;
+	private Timer timer = new Timer();
 
 	public HipoqihMIDlet () throws Exception 
 	{ 
+		System.out.println("dentro");
 		display = Display.getDisplay(this);
-		exitCommand = new Command("EXIT", Command.SCREEN, 2);
-		goCommand = new Command("GO", Command.SCREEN, 1);
 	}
 	
 	public static Display getDisplay()
@@ -56,11 +57,10 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
 	      e.printStackTrace();
 	    }
 
-	    SplashScreen splash = new SplashScreen ();
-	    splash.addCommand(exitCommand);
-	    splash.addCommand(goCommand);
+	    SplashScreen splash = new SplashScreen (this);
 	    splash.setFullScreenMode(true);
-	    splash.setCommandListener( (CommandListener) this);
+	    // We exit Splash after 5 seconds
+		timer.schedule(new TimerTask() { public void run() {nextDisplay();} }, 5000);
 	    display.setCurrent(splash);
 	}
 	
@@ -85,33 +85,25 @@ public class HipoqihMIDlet extends MIDlet implements CommandListener, ProviderSt
 			e.printStackTrace();
 		}
 	}
-
-	public void commandAction(Command command, Displayable screen) 
-	{
-		if (command == exitCommand) 
-		{
-			destroyApp(false);
-			notifyDestroyed();
-	    } 
-		else if (command == goCommand) 
-		{ 
-	        if (ConfigurationProvider.isLocationApiSupported())
-	        {
-	            ConfigurationProvider.getInstance().autoSearch(this);
-	        }
-	        else
-	        {
-	            Alert alert = new Alert("Error",
-	                    "Location API not supported!", null,
-	                    AlertType.ERROR);
-	            display.setCurrent(alert);
-	        }
-
-			// MainFormUI need to access life cycle and MIDlet methods
-			MainFormUI.m = this;
-	    }
-	}
 	
+	public void nextDisplay()
+	{
+        if (ConfigurationProvider.isLocationApiSupported())
+        {
+            ConfigurationProvider.getInstance().autoSearch(this);
+        }
+        else
+        {
+            Alert alert = new Alert("Error",
+                    "Location API not supported!", null,
+                    AlertType.ERROR);
+            display.setCurrent(alert);
+        }
+
+		// MainFormUI need to access life cycle and MIDlet methods
+		MainFormUI.m = this;	
+	}
+
     public void providerSelectedEvent()
     {
         // Attempt to acquire the mutex
