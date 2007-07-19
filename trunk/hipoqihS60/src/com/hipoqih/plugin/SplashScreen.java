@@ -13,12 +13,7 @@
  *
  * */
 package com.hipoqih.plugin;
- 
-<<<<<<< .mine
-=======
-import java.io.*;
 
->>>>>>> .r90
 import javax.microedition.lcdui.*;
 
 public class SplashScreen extends Canvas implements Runnable
