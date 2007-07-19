@@ -16,9 +16,6 @@
 package com.hipoqih.plugin.s60_3rd;
 
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import com.hipoqih.plugin.*;
 import javax.microedition.midlet.*;
 import javax.microedition.lcdui.*;
@@ -31,11 +28,9 @@ public class HipoqihMIDlet extends MIDlet implements ProviderStatusListener, MID
 	private static Display display;
     private Object mutex = new Object();
     private HipoqihData data = null;
-	private Timer timer = new Timer();
 
 	public HipoqihMIDlet () throws Exception 
 	{ 
-		System.out.println("dentro");
 		display = Display.getDisplay(this);
 	}
 	
@@ -59,8 +54,6 @@ public class HipoqihMIDlet extends MIDlet implements ProviderStatusListener, MID
 
 	    SplashScreen splash = new SplashScreen (this);
 	    splash.setFullScreenMode(true);
-	    // We exit Splash after 5 seconds
-		timer.schedule(new TimerTask() { public void run() {nextDisplay();} }, 5000);
 	    display.setCurrent(splash);
 	}
 	
