@@ -52,12 +52,9 @@ public class SplashScreen extends Canvas implements Runnable
 	
 	public void run()
 	{
-		while(true)
+		while(firstExec)
 		{
-			if (firstExec)
-				firstExec = false;
-			else
-				m.nextDisplay();
+			firstExec = false;
 			
 			try
 			{
@@ -65,6 +62,7 @@ public class SplashScreen extends Canvas implements Runnable
 			}
 			catch(Exception e){}
 		}
+		m.nextDisplay();
 	}
 	
 	public void keyPressed(int keyCode)
