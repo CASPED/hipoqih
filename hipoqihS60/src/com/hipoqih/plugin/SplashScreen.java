@@ -19,16 +19,15 @@ import javax.microedition.lcdui.*;
 public class SplashScreen extends Canvas implements Runnable
 {
 	private MIDletExiter m;
-	Image img[]=new Image[2];
-	int imgIndex = 0;
+	Image img = null;
+	boolean firstExec = true;
 	
 	public SplashScreen (MIDletExiter me) 
 	{
 		m = me;
 		try
 		{
-			img[0]=Image.createImage("/hipoqihSplash.PNG");
-			img[1]=Image.createImage("/hipoqihSplash2.png");
+			img=Image.createImage("/hipoqihSplash.PNG");
 		}
 		catch(Exception e){}
 		Thread th=new Thread(this);
@@ -42,7 +41,7 @@ public class SplashScreen extends Canvas implements Runnable
 
 		try 
 		{
-			g.drawImage(img[imgIndex], w/2, h/2, Graphics.VCENTER | Graphics.HCENTER);
+			g.drawImage(img, w/2, h/2, Graphics.VCENTER | Graphics.HCENTER);
 		} 
 		catch (Exception e) 
 		{
@@ -55,16 +54,14 @@ public class SplashScreen extends Canvas implements Runnable
 	{
 		while(true)
 		{
-			if (imgIndex == 0)
-				imgIndex = 1;
+			if (firstExec)
+				firstExec = false;
 			else
-				imgIndex = 0;
-			
-			repaint();
+				m.nextDisplay();
 			
 			try
 			{
-				Thread.sleep(500);
+				Thread.sleep(3000);
 			}
 			catch(Exception e){}
 		}
