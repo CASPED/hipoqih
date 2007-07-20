@@ -33,7 +33,7 @@
 // intellectual property rights is granted herein.
 package com.hipoqih.plugin.s60_3rd.gps;
 
-import com.hipoqih.plugin.s60_3rd.*;
+import com.hipoqih.plugin.State;
 import javax.microedition.location.*;
 import javax.microedition.lcdui.*;
 
@@ -78,14 +78,14 @@ public class ConfigurationProvider
             {
                 Alert alert = new Alert("Error", "GPS unavailable", null, AlertType.ERROR);
                 alert.setTimeout(Alert.FOREVER);
-                HipoqihMIDlet.getDisplay().setCurrent(alert);
+                State.display.setCurrent(alert);
             }
         }
         catch (LocationException le)
         {
             Alert alert = new Alert("Error", "Error looking for providers", null, AlertType.ERROR);
             alert.setTimeout(Alert.FOREVER);
-            HipoqihMIDlet.getDisplay().setCurrent(alert);
+            State.display.setCurrent(alert);
         }
     }
 

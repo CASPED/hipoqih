@@ -116,7 +116,7 @@ public class HipoWeb
 			if ( c != null )
 				c.close();
 		}
-		
+
 		return image;	
 	}
 	

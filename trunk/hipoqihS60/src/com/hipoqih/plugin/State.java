@@ -43,7 +43,7 @@ public class State
 	public static int alertLeft = 0;
 	public static RecordStore recordStore;
 	public static Hashtable recordMaps = new Hashtable();
-	public static int zoom = 10000;
+	public static int zoom = 8000;
 	public static int connectionPeriod = 2000;
 	public static String secureId = "";
 	public static Display display = null;
