@@ -25,20 +25,14 @@ import com.hipoqih.plugin.s60_3rd.gps.*;
 
 public class HipoqihMIDlet extends MIDlet implements ProviderStatusListener, MIDletExiter
 {
-	private static Display display;
     private Object mutex = new Object();
     private HipoqihData data = null;
 
 	public HipoqihMIDlet () throws Exception 
 	{ 
-		display = Display.getDisplay(this);
+		State.display = Display.getDisplay(this);
 	}
 	
-	public static Display getDisplay()
-	{
-		return display;
-	}
- 
 	public void startApp() 
 	{
 		try 
@@ -54,7 +48,7 @@ public class HipoqihMIDlet extends MIDlet implements ProviderStatusListener, MID
 
 	    SplashScreen splash = new SplashScreen (this);
 	    splash.setFullScreenMode(true);
-	    display.setCurrent(splash);
+	    State.display.setCurrent(splash);
 	}
 	
 	public void exit()
@@ -90,7 +84,7 @@ public class HipoqihMIDlet extends MIDlet implements ProviderStatusListener, MID
             Alert alert = new Alert("Error",
                     "Location API not supported!", null,
                     AlertType.ERROR);
-            display.setCurrent(alert);
+            State.display.setCurrent(alert);
         }
 
 		// MainFormUI need to access life cycle and MIDlet methods
@@ -112,7 +106,7 @@ public class HipoqihMIDlet extends MIDlet implements ProviderStatusListener, MID
                     AlertType.INFO);
             alert.setIndicator(indicator);
 
-            display.setCurrent(alert);
+            State.display.setCurrent(alert);
 
             // Inform the user that MIDlet is looking for location data.
             data = new HipoqihData((ProviderStatusListener) this);
@@ -126,7 +120,7 @@ public class HipoqihMIDlet extends MIDlet implements ProviderStatusListener, MID
         {
         	MainFormUI mf = new MainFormUI();
         	data.setMainForm(mf);
-        	display.setCurrent(mf);
+        	State.display.setCurrent(mf);
         }
     }
 

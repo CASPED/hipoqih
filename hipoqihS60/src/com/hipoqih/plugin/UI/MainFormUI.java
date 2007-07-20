@@ -45,6 +45,8 @@ public class MainFormUI extends Form implements CommandListener
 	javax.microedition.lcdui.Command cmdMap = new Command("Map", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdSettings = new Command("Settings", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdShowLog = new Command("Log", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdZoomIn = new Command("Zoom In", Command.SCREEN, 1);
+	javax.microedition.lcdui.Command cmdZoomOut = new Command("Zoom out", Command.SCREEN, 1);
 	javax.microedition.lcdui.Command cmdExitMap = new Command("Exit", Command.SCREEN, 1);
 	
 	private boolean isConnected = false;
@@ -217,6 +219,22 @@ public class MainFormUI extends Form implements CommandListener
 		{
 			showMap();
 		}
+		else if (command == cmdZoomIn)
+		{
+			if (State.zoom > 500)
+			{
+				State.zoom /= 2;
+				showMap();
+			}
+		}
+		else if (command == cmdZoomOut)
+		{
+			if (State.zoom < 256000)
+			{
+				State.zoom *= 2;
+				showMap();
+			}
+		}
 		else if(command == cmdExitMap)
 		{
 			State.display.setCurrent(this);
@@ -247,28 +265,31 @@ public class MainFormUI extends Form implements CommandListener
 			alertScreen.setString("There are no position coordinates");
 			alertScreen.setTimeout(Alert.FOREVER);
 			State.display.setCurrent(alertScreen);
-			}
+		}
 		try
 		{
-			Form form = new Form("Map");
-			int width = form.getWidth();
-			int height = form.getHeight();
+			MapCanvas map = new MapCanvas();
+			int width = map.getWidth();
+			int height = map.getHeight();
 			Image image = getMap(height, width);
-			form.append(image);
-			form.addCommand(cmdExitMap);
-			form.setCommandListener(this);
-			State.display.setCurrent(form);
+			map.setMap(image);
+			map.addCommand(cmdZoomIn);
+			map.addCommand(cmdZoomOut);
+			map.addCommand(cmdExitMap);
+			map.setCommandListener(this);
+			State.display.setCurrent(map);
 		}
 		catch(IOException ioe)
 		{
-			System.out.println(ioe.getMessage());
+			System.out.println("IOEx:" + ioe.getMessage());
 			ioe.printStackTrace();
 		}
 		catch(Exception ex)
 		{
-			System.out.println(ex.getMessage());
+			System.out.println("Ex:" + ex.getMessage());
 			ex.printStackTrace();
-		}	}
+		}	
+	}
 	
 	private boolean connectToWeb()
 	{
@@ -423,7 +444,7 @@ public class MainFormUI extends Form implements CommandListener
     {
    		double longitude = Double.parseDouble(strLongitudeData.getText());
    		double latitude = Double.parseDouble(strLatitudeData.getText());
-    	
+
     	double multipliedLon = longitude * 1000000;
     	if (multipliedLon < 0)
     		multipliedLon = multipliedLon + 1073741824 + 1073741824 + 1073741824 + 1073741824;
