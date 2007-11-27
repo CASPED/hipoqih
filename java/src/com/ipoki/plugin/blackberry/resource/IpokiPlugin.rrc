@@ -1,0 +1,15 @@
+APP_TITLE#0="Ipoki Plugin";
+LBL_ALERT_REQUESTINPROGRESS#0="Uncompleted request pending!";
+LBL_CONNECTED#0="Connected";
+LBL_DISCONNECTED#0="Disconnected";
+MNU_ABOUT#0="About Ipoki";
+MNU_CLOSE#0="Close";
+MNU_CONNECT#0="Connect";
+MNU_DISCONNECT#0="Disconnect";
+MNU_EXIT#0="Exit";
+MNU_FRIENDS#0="My friends";
+MNU_MAP#0="Map";
+MNU_MENU#0="Menu";
+MNU_OPTIONS#0="Options";
+MNU_POSITION_LOG_OFF#0="Disable log";
+MNU_POSITION_LOG_ON#0="Enable log";
