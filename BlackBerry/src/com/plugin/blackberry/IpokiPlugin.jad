@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+MIDlet-Version: 0.0
+MIDlet-Jar-Size: 1698
+MicroEdition-Configuration: CLDC-1.1
+MIDlet-Jar-URL: IpokiPlugin.jar
+RIM-COD-Module-Dependencies: net_rim_cldc
+RIM-MIDlet-Flags-1: 0
+RIM-COD-Module-Name: IpokiPlugin
+MIDlet-Name: IpokiPlugin
+RIM-COD-Size: 5716
+RIM-COD-Creation-Time: 1196108020
+MIDlet-1: ,,
+RIM-COD-URL: IpokiPlugin.cod
+RIM-MIDlet-NameResourceId-1: 0
+RIM-COD-SHA1: 6d ae f8 04 04 6e db d3 aa 1f 55 d7 92 eb 28 9c 2a 61 5e cb
+MicroEdition-Profile: MIDP-2.0
+MIDlet-Vendor: <unknown>
+RIM-MIDlet-NameResourceBundle-1: com.ipoki.plugin.blackberry.resource.IpokiPlugin
