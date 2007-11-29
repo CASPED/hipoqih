@@ -19,8 +19,8 @@ AutoRestart=0
 ExcludeFromBuildAll=0
 [Files
 ConnectionThread.java
+IpokiMainScreen.java
 IpokiPlugin.java
-IpokiWebConnection.java
 resource\IpokiPlugin.rrc
 resource\IpokiPlugin.rrh
 StatusThread.java

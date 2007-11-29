@@ -11,6 +11,7 @@ import com.ipoki.plugin.blackberry.resource.*;
 import java.lang.*;
 import javax.microedition.io.*;
 import net.rim.device.api.i18n.*;
+import net.rim.device.api.ui.*;
 import net.rim.device.api.ui.component.Dialog;
 
 public class ConnectionThread extends Thread implements IpokiPluginResource
@@ -22,25 +23,35 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
     private volatile boolean _start = false;
     private volatile boolean _stop = false;
     
+    IpokiPlugin _app;
+    
+    public ConnectionThread()
+    {
+        _app = (IpokiPlugin)UiApplication.getUiApplication();
+    }
+        
     public synchronized String getUrl()
     {
         return _theUrl;
     }
     
-    public void fetch(String url)
+    public void connect()
     {
-        synchronized(this)
-        {
-            if (_start)
+            if ( _start )
             {
                 Dialog.alert(_resources.getString(LBL_ALERT_REQUESTINPROGRESS));
-            }
-            else
+            }        
+            synchronized(this)
             {
-                _start = true;
-                _theUrl = url;
+                if (_start)
+                {
+                    Dialog.alert(_resources.getString(LBL_ALERT_REQUESTINPROGRESS));
+                }
+                else
+                {
+                    _start = true;
+                }
             }
-        }
     }
     
     public void run()
@@ -66,7 +77,17 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
             
             synchronized(this)
             {
-                StreamConnection s = null;
+                try
+                {
+                    Thread.sleep(10000);
+                    stopStatusThread();
+                    _app.updateContent("Hecho");
+                }
+                catch(InterruptedException ie)
+                {
+                    System.err.println(ie.toString());
+                }
+                /*StreamConnection s = null;
                 try
                 {
                     s = (StreamConnection)Connector.open(getUrl());
@@ -88,18 +109,44 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                         }
                         String[] messages = parseMessage(raw.toString());
                     }
+                    
+                    
                 }
                 catch (java.io.IOException e) 
                 {
                     System.err.println(e.toString());
                     //stopStatusThread();
                     //updateContent(e.toString());
-                }
+                }*/
 
                 _start = false;
             } // synchronized
         } // for
     } // run
+    
+    private void stopStatusThread()
+    {
+        _app._statusThread.pause();
+        try 
+        {
+            synchronized(_app._statusThread)
+            {
+                //Check the paused condition, incase the notify fires prior to our wait, in which case we may never see that nofity
+                while ( !_app._statusThread.isPaused() );
+                {
+                    _app._statusThread.wait();
+                }
+            }
+        } 
+        catch (InterruptedException e) {
+            System.err.println(e.toString());
+        }
+    }
+
+    public void stop()
+    {
+        _stop = true;
+    }
     
     private String[] parseMessage(String mensaje)
     {
@@ -122,9 +169,4 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         return respuesta;
     }
 
-    
-    public void stop()
-    {
-        _stop = true;
-    }
 } // class

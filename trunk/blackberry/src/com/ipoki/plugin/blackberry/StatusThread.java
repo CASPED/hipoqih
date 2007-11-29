@@ -8,6 +8,7 @@
 package com.ipoki.plugin.blackberry;
 
 import java.lang.*;
+import net.rim.device.api.ui.*;
 
 /*
 * Thread can be running or stopped.
@@ -16,11 +17,18 @@ import java.lang.*;
 public class StatusThread extends Thread
 {
     private static final int THREAD_TIMEOUT = 500;
+    private static final int TIMEOUT = 500; //ms
 
     private volatile boolean _stop = false;
     private volatile boolean _running = false;
     private volatile boolean _isPaused = false;
 
+    IpokiPlugin _app;
+
+    public StatusThread()
+    {
+        _app = (IpokiPlugin)UiApplication.getUiApplication();
+    }
     // Resume execution after pause
     public void go()
     {
@@ -35,6 +43,11 @@ public class StatusThread extends Thread
     public void pause()
     {
         _running = false;
+    }
+    
+    public boolean isPaused()
+    {
+        return _isPaused;
     }
     
     // Ends thread
@@ -69,6 +82,7 @@ public class StatusThread extends Thread
                 return;
             }
             
+            i=0;
             // Loop until stopped or paused
             for(;;)
             {
@@ -87,6 +101,14 @@ public class StatusThread extends Thread
                         this.notify();
                     }
                     break;
+                }
+
+                _app.updateGauge(++i%10);
+
+                try {
+                    this.sleep(TIMEOUT); //wait for a bit
+                } catch (InterruptedException e) {
+                    System.err.println(e.toString());
                 }
             }
         }
