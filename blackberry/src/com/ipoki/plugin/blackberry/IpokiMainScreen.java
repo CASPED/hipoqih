@@ -18,15 +18,49 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
     static ResourceBundle _resources = ResourceBundle.getBundle(BUNDLE_ID, BUNDLE_NAME);
     
     IpokiPlugin _app;
-    LabelField _lblStatus;
+    
 
     public IpokiMainScreen()
     {
         super(DEFAULT_MENU | DEFAULT_CLOSE);
         setTitle(_resources.getString(APP_TITLE));
         _app = (IpokiPlugin)UiApplication.getUiApplication();
-        _lblStatus = new LabelField(_resources.getString(LBL_DISCONNECTED));
-        add(_lblStatus);
+        
+        _app._lblUser = new LabelField(IpokiPlugin._user);
+        Font font = _app._lblUser.getFont();
+        Font newFont = font.derive(Font.BOLD);
+        _app._lblUser.setFont(newFont);
+        add(_app._lblUser);
+        
+        _app._lblStatus = new LabelField(_resources.getString(LBL_DISCONNECTED));
+        add(_app._lblStatus);
+        
+        SeparatorField sep = new SeparatorField();
+        add(sep);
+        
+        LabelField lblTextLongitude = new LabelField(_resources.getString(LBL_LONGITUDE));
+        font = lblTextLongitude.getFont();
+        newFont = font.derive(Font.ITALIC);
+        lblTextLongitude.setFont(newFont);
+        add(lblTextLongitude);
+        
+        _app._lblLongitude = new LabelField(_resources.getString(LBL_NOLOC));
+        font = _app._lblLongitude.getFont();
+        newFont = font.derive(Font.BOLD);
+        _app._lblLongitude.setFont(newFont);
+        add(_app._lblLongitude);
+
+        LabelField lblTextLatitude = new LabelField(_resources.getString(LBL_LATITUDE));
+        font = lblTextLatitude.getFont();
+        newFont = font.derive(Font.ITALIC);
+        lblTextLatitude.setFont(newFont);
+        add(lblTextLatitude);
+        
+        _app._lblLatitude = new LabelField(_resources.getString(LBL_NOLOC));
+        font = _app._lblLatitude.getFont();
+        newFont = font.derive(Font.BOLD);
+        _app._lblLatitude.setFont(newFont);
+        add(_app._lblLatitude);
     }
     
     public void makeMenu(Menu menu, int instance)
@@ -77,6 +111,7 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
     {
         public void run()
         {
+            _app.viewOptions();
         }        
     };    
     

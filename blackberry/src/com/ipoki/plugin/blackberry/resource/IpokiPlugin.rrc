@@ -1,8 +1,11 @@
 APP_TITLE#0="Ipoki Plugin";
 LBL_ALERT_REQUESTINPROGRESS#0="Uncompleted request pending!";
-LBL_CONNECTED#0="Connected";
-LBL_DISCONNECTED#0="Disconnected";
+LBL_CONNECTED#0="CONNECTED";
+LBL_DISCONNECTED#0="DISCONNECTED";
 LBL_FREQ#0="Signal frequency (secs)";
+LBL_LATITUDE#0="Latitude:";
+LBL_LONGITUDE#0="Longitude:";
+LBL_NOLOC#0="No location";
 LBL_PASSWORD#0="Password";
 LBL_USER#0="User";
 MNU_ABOUT#0="About Ipoki";

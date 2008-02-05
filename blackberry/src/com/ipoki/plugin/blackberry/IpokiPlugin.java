@@ -22,6 +22,7 @@
 package com.ipoki.plugin.blackberry;
 
 import javax.microedition.rms.*;
+import javax.microedition.location.*;
 import net.rim.device.api.ui.*;
 import net.rim.device.api.ui.container.*;
 import net.rim.device.api.ui.component.*;
@@ -33,10 +34,18 @@ import com.ipoki.plugin.blackberry.resource.*;
 public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
 {
     private IpokiMainScreen _mainScreen;
-    
+    private static int _interval = 1; //seconds - this is the period of position query
+
     PopupScreen _gaugeScreen;
     GaugeField _gauge;
     LabelField _label;
+    private LocationProvider _locationProvider;    
+
+
+    LabelField _lblStatus;
+    LabelField _lblUser;
+    LabelField _lblLongitude;
+    LabelField _lblLatitude;
     
     static ResourceBundle _resources = ResourceBundle.getBundle(BUNDLE_ID, BUNDLE_NAME);
     static PersistentObject _userStore;
@@ -66,14 +75,19 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         }
     }
     
-    static void SaveOptions(String user, String pass, String freq)
+    public void viewOptions()
+    {
+        SetupScreen setupScreen = new SetupScreen();
+        pushScreen(setupScreen);
+    }
+    
+    static void saveOptions(String user, String pass, String freq)
     {
         synchronized(_userStore)
         {
             _userStore.setContents(user);
             _userStore.commit();
             _user = user;
-
         }
         synchronized(_passStore)
         {
@@ -124,7 +138,7 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         private MenuItem _save = new MenuItem(IpokiPlugin._resources, MNU_SAVE, 200000, 10) {
             public void run()
             {   
-                IpokiPlugin.SaveOptions(_userEdit.getText(), _passEdit.getText(), _freqEdit.getText());
+                IpokiPlugin.saveOptions(_userEdit.getText(), _passEdit.getText(), _freqEdit.getText());
                 IpokiPlugin.this.popScreen(SetupScreen.this);
             }
         };
@@ -166,6 +180,87 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
             SetupScreen setupScreen = new SetupScreen();
             pushScreen(setupScreen);
         }
+        
+        if (startLocationUpdate())
+        {
+        }
+    }
+    
+    private boolean startLocationUpdate()
+    {
+        boolean retval = false;
+        
+        try 
+        {
+            _locationProvider = LocationProvider.getInstance(null);
+            
+            if ( _locationProvider == null ) 
+            {
+                // We would like to display a dialog box indicating that GPS isn't supported, but because
+                // the event-dispatcher thread hasn't been started yet, modal screens cannot be pushed onto
+                // the display stack.  So delay this operation until the event-dispatcher thread is running
+                // by asking it to invoke the following Runnable object as soon as it can.
+                Runnable showGpsUnsupportedDialog = new Runnable() 
+                {
+                    public void run() 
+                    {
+                        Dialog.alert("GPS is not supported on this platform, exiting...");
+                        System.exit( 1 );
+                    }
+                };
+                invokeLater( showGpsUnsupportedDialog );  // ask event-dispatcher thread to display dialog ASAP
+            } else 
+            {
+                // only a single listener can be associated with a provider, and unsetting it involves the same
+                // call but with null, therefore, no need to cache the listener instance
+                // request an update every second
+                _locationProvider.setLocationListener(new LocationListenerImpl(), _interval, 1, 1);
+                retval = true;
+            }
+        } catch (LocationException le) {
+            System.err.println("Failed to instantiate the LocationProvider object, exiting...");
+            System.err.println(le); 
+            System.exit(0);
+        }        
+        return retval;
+    }
+    
+    private class LocationListenerImpl implements LocationListener
+    {
+        //members --------------------------------------------------------------
+        private int captureCount;
+        private int sendCount;
+        
+        //methods --------------------------------------------------------------
+        public void locationUpdated(LocationProvider provider, Location location)
+        {
+            if(location.isValid())
+            {
+                double longitude = location.getQualifiedCoordinates().getLongitude();
+                double latitude = location.getQualifiedCoordinates().getLatitude();
+                float altitude = location.getQualifiedCoordinates().getAltitude();
+                float speed = location.getSpeed();                
+                
+                UpdateLocation(String.valueOf(longitude), String.valueOf(latitude));
+            }
+        }
+  
+        public void providerStateChanged(LocationProvider provider, int newState)
+        {
+            //no-op
+        }        
+    }
+    
+    private void UpdateLocation(final String longitude, final String latitude)
+    {
+        invokeLater(new Runnable() 
+        {
+            public void run()
+            {
+                _lblLongitude.setText(longitude);
+                _lblLatitude.setText(latitude);
+            }
+        });    
     }
     
     public void connect()
