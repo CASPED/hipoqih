@@ -23,6 +23,7 @@ IpokiMainScreen.java
 IpokiPlugin.java
 resource\IpokiPlugin.rrc
 resource\IpokiPlugin.rrh
+SetupScreen.java
 StatusThread.java
 WaitingScreen.java
 ]
