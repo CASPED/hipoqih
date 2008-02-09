@@ -52,6 +52,7 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
     static PersistentObject _passStore;
     static PersistentObject _freqStore;
     static String _idUser = "";
+    static String _comment = "";
     static String _user;
     static String _pass;
     static int _freq;
@@ -157,6 +158,8 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
     
     StatusThread _statusThread = new StatusThread();
     ConnectionThread _connectionThread = new ConnectionThread();
+    ListenThread _listenThread = new ListenThread();
+    
     // App entry point
     public static void main(String[] args)
     {
@@ -173,6 +176,7 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         //start the helper threads
         _statusThread.start();
         _connectionThread.start();
+        _listenThread.start();
         
         pushScreen(_mainScreen);
 
@@ -269,9 +273,10 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         _gaugeScreen = new PopupScreen(new VerticalFieldManager());
         _gauge = new GaugeField("Connecting...", 0, 9, 0, GaugeField.LABEL_AS_PROGRESS);
         _gaugeScreen.add(_gauge);
-        _connectionThread.connect("http://www.ipoki.com/signin.php");
-        _statusThread.go();
-        pushScreen(_gaugeScreen);
+        _connectionThread.signIn(_user, _pass);
+        //_statusThread.go();
+        _listenThread.go();
+        //pushScreen(_gaugeScreen);
     }
     
     public void updateGauge(final int i)
