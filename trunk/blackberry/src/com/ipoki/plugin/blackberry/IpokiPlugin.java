@@ -51,6 +51,7 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
     static PersistentObject _userStore;
     static PersistentObject _passStore;
     static PersistentObject _freqStore;
+    static String _idUser = "";
     static String _user;
     static String _pass;
     static int _freq;
@@ -268,7 +269,7 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         _gaugeScreen = new PopupScreen(new VerticalFieldManager());
         _gauge = new GaugeField("Connecting...", 0, 9, 0, GaugeField.LABEL_AS_PROGRESS);
         _gaugeScreen.add(_gauge);
-        _connectionThread.connect();
+        _connectionThread.connect("http://www.ipoki.com/signin.php");
         _statusThread.go();
         pushScreen(_gaugeScreen);
     }
