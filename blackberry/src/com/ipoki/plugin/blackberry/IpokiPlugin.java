@@ -279,6 +279,12 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         //pushScreen(_gaugeScreen);
     }
     
+    public void disconnect()
+    {
+        if (!_idUser.equals(""))
+            _connectionThread.signout(_idUser);
+    }
+    
     public void updateGauge(final int i)
     {
         UiApplication.getUiApplication().invokeLater(new Runnable() {

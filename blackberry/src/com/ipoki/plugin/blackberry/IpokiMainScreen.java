@@ -66,6 +66,7 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
     public void makeMenu(Menu menu, int instance)
     {
         menu.add(invokeConnect);
+        menu.add(invokeDisconnect);
         menu.addSeparator();
         menu.add(invokeMap);
         menu.add(invokeFriends);
@@ -82,6 +83,15 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
         public void run()
         {
             _app.connect();
+            
+        }        
+    };    
+    
+    MenuItem invokeDisconnect  = new MenuItem(_resources.getString(MNU_DISCONNECT),0,0)
+    {
+        public void run()
+        {
+            _app.disconnect();
             
         }        
     };    
@@ -126,6 +136,7 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
     {
         public void run()
         {
+            _app.disconnect();
             onClose();
         }        
     };    
