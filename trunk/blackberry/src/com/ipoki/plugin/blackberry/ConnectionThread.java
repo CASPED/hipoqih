@@ -112,7 +112,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                 else
                 {
                     _start = true;
-                    _theUrl = SIGNOUT + "?iduser=";
+                    _theUrl = SIGNOUT + "?iduser=" + idUser;
                     _urlType = SIGNOUT_S;
                 }
             }
@@ -190,6 +190,13 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         if (typeMessage.equals("CODIGO"))
         {
             IpokiPlugin._idUser = (String)messages.elementAt(1);
+            _app.invokeLater(new Runnable() 
+            {
+                public void run()
+                {
+                    _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_CONNECTED));                
+                }
+            });    
         }
         else if(typeMessage.equals("COMMENT"))
         {
@@ -197,6 +204,16 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                 return;
                 
             IpokiPlugin._comment = (String)messages.elementAt(1) + ": " + (String)messages.elementAt(2);
+        }
+        if (_urlType == SIGNOUT_S && typeMessage.equals("OK"))
+        {
+            _app.invokeLater(new Runnable() 
+            {
+                public void run()
+                {
+                    _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_CONNECTED));
+                }
+            });    
         }
     }
 
