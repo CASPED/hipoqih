@@ -35,7 +35,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         return _theUrl;
     }
     
-    public void connect()
+    public void connect(String url)
     {
             if ( _start )
             {
@@ -50,6 +50,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                 else
                 {
                     _start = true;
+                    _theUrl = url;
                 }
             }
     }
@@ -77,21 +78,12 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
             
             synchronized(this)
             {
-                try
-                {
-                    Thread.sleep(10000);
-                    stopStatusThread();
-                    _app.updateContent("Hecho");
-                }
-                catch(InterruptedException ie)
-                {
-                    System.err.println(ie.toString());
-                }
-                /*StreamConnection s = null;
+                StreamConnection s = null;
                 try
                 {
                     s = (StreamConnection)Connector.open(getUrl());
                     HttpConnection httpConn = (HttpConnection)s;
+                    httpConn.setRequestProperty("User-Agent", "IpokiPlugin/BlackBerry4.3/0.1");
                     
                     int status = httpConn.getResponseCode();
                     if (status == HttpConnection.HTTP_OK)
@@ -108,6 +100,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                             size += len;
                         }
                         String[] messages = parseMessage(raw.toString());
+                        IpokiPlugin._idUser = messages[1];
                     }
                     
                     
@@ -115,9 +108,8 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                 catch (java.io.IOException e) 
                 {
                     System.err.println(e.toString());
-                    //stopStatusThread();
-                    //updateContent(e.toString());
-                }*/
+                    stopStatusThread();
+                }
 
                 _start = false;
             } // synchronized
