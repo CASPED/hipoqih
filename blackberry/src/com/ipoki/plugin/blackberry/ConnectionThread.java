@@ -18,8 +18,19 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
 {
     private static ResourceBundle _resources = ResourceBundle.getBundle(BUNDLE_ID, BUNDLE_NAME);
     private static final int TIMEOUT = 500;
+    private static final int RETRY_TIME = 100;
     private String _theUrl;
-
+    private static final String SIGNIN = "http://www.ipoki.com/signin.php";
+    private static final String EAR = "http://www.ipoki.com/ear.php";
+    private static final String SIGNOUT = "http://www.ipoki.com/signout.php";
+    private static final String READPOS = "http://www.ipoki.com/readposition.php";
+    private static final String MYFRIENDS = "http://www.ipoki.com/myfriends.php";
+    private static final int SIGNIN_S = 0;
+    private static final int EAR_S = 1;
+    private static final int SIGNOUT_S = 2;
+    private static final int READPOS_S = 3;
+    private static final int MYFRIENDS_S = 4;
+    private int _urlType = 0;
     private volatile boolean _start = false;
     private volatile boolean _stop = false;
     
@@ -35,24 +46,81 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         return _theUrl;
     }
     
-    public void connect(String url)
+    public void signIn(String user, String pass)
     {
-            if ( _start )
+        if ( _start )
+        {
+            Dialog.alert(_resources.getString(LBL_ALERT_REQUESTINPROGRESS));
+        }        
+        synchronized(this)
+        {
+            if (_start)
             {
                 Dialog.alert(_resources.getString(LBL_ALERT_REQUESTINPROGRESS));
+            }
+            else
+            {
+                _start = true;
+                _theUrl = SIGNIN + "?user=" + user + "&pass=" + pass;
+                _urlType = SIGNIN_S;
+            }
+        }
+    }
+    
+    public void ear(String idUser, String lat, String lon, String comment)
+    {
+        try
+        {
+            if ( _start )
+            {
+                sleep(RETRY_TIME);
             }        
             synchronized(this)
             {
                 if (_start)
                 {
-                    Dialog.alert(_resources.getString(LBL_ALERT_REQUESTINPROGRESS));
+                    sleep(RETRY_TIME);
                 }
                 else
                 {
                     _start = true;
-                    _theUrl = url;
+                    _theUrl = EAR + "?iduser=" + idUser + "&lat=" + lat + "&lon=" + lon + "&comment=" + comment;
+                    _urlType = EAR_S;
                 }
             }
+        }
+        catch(InterruptedException e)
+        {
+            System.err.println(e.toString());
+        }
+    }
+    
+    public void signout(String idUser)
+    {
+        try
+        {
+            if ( _start )
+            {
+                sleep(RETRY_TIME);
+            }        
+            synchronized(this)
+            {
+                if (_start)
+                {
+                    sleep(RETRY_TIME);
+                }
+                else
+                {
+                    _start = true;
+                    _theUrl = SIGNOUT + "?iduser=";
+                    _urlType = SIGNOUT_S;
+                }
+            }
+        }
+        catch(InterruptedException e)
+        {
+            System.err.println(e.toString());
+        }
     }
     
     public void run()
@@ -99,39 +167,36 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                             raw.append(new String(data, 0, len));
                             size += len;
                         }
-                        String[] messages = parseMessage(raw.toString());
-                        IpokiPlugin._idUser = messages[1];
+                        java.util.Vector messages = parseMessage(raw.toString());
+                        processMessages(messages);
                     }
-                    
-                    
                 }
                 catch (java.io.IOException e) 
                 {
                     System.err.println(e.toString());
-                    stopStatusThread();
                 }
 
                 _start = false;
             } // synchronized
         } // for
     } // run
-    
-    private void stopStatusThread()
+
+    private void processMessages(java.util.Vector messages)
     {
-        _app._statusThread.pause();
-        try 
+        if (messages.size() < 2)
+            return;
+        
+        String typeMessage = (String)messages.elementAt(0);
+        if (typeMessage.equals("CODIGO"))
         {
-            synchronized(_app._statusThread)
-            {
-                //Check the paused condition, incase the notify fires prior to our wait, in which case we may never see that nofity
-                while ( !_app._statusThread.isPaused() );
-                {
-                    _app._statusThread.wait();
-                }
-            }
-        } 
-        catch (InterruptedException e) {
-            System.err.println(e.toString());
+            IpokiPlugin._idUser = (String)messages.elementAt(1);
+        }
+        else if(typeMessage.equals("COMMENT"))
+        {
+            if (messages.size() < 3)
+                return;
+                
+            IpokiPlugin._comment = (String)messages.elementAt(1) + ": " + (String)messages.elementAt(2);
         }
     }
 
@@ -140,7 +205,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         _stop = true;
     }
     
-    private String[] parseMessage(String mensaje)
+    private java.util.Vector parseMessage(String mensaje)
     {
         // Temporalmente almacenaremos los mensajes en un vector 
         // (ya que nos abemos el número de elementos)
@@ -155,10 +220,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
             mensaje = mensaje.substring(mensaje.indexOf("$$$") + 3);
         }
             
-        // Copiamos el vector a un array de Strings
-        String[] respuesta = new String[mensajes.size()];
-        mensajes.copyInto(respuesta);
-        return respuesta;
+        return mensajes;
     }
 
 } // class

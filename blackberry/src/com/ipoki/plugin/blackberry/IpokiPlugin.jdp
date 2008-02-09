@@ -21,9 +21,9 @@ ExcludeFromBuildAll=0
 ConnectionThread.java
 IpokiMainScreen.java
 IpokiPlugin.java
+ListenThread.java
 resource\IpokiPlugin.rrc
 resource\IpokiPlugin.rrh
-SetupScreen.java
 StatusThread.java
 WaitingScreen.java
 ]
