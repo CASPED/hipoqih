@@ -68,10 +68,10 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
         menu.add(invokeConnect);
         menu.add(invokeDisconnect);
         menu.addSeparator();
-        menu.add(invokeMap);
-        menu.add(invokeFriends);
-        menu.addSeparator();
-        menu.add(invokePositionLog);
+        //menu.add(invokeMap);
+        //menu.add(invokeFriends);
+        //menu.addSeparator();
+        //menu.add(invokePositionLog);
         menu.add(invokeOptions);
         menu.add(invokeAbout);
         menu.addSeparator();
@@ -92,7 +92,6 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
         public void run()
         {
             _app.disconnect();
-            
         }        
     };    
 
@@ -129,6 +128,7 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
     {
         public void run()
         {
+            _app.showAbout();
         }        
     };    
 
@@ -136,7 +136,6 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
     {
         public void run()
         {
-            _app.disconnect();
             onClose();
         }        
     };    

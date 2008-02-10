@@ -149,9 +149,10 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                 StreamConnection s = null;
                 try
                 {
+                    System.err.println("open conn");
                     s = (StreamConnection)Connector.open(getUrl());
                     HttpConnection httpConn = (HttpConnection)s;
-                    httpConn.setRequestProperty("User-Agent", "IpokiPlugin/BlackBerry4.3/0.1");
+                    httpConn.setRequestProperty("User-Agent", "IpokiPlugin/BlackBerry/0.1");
                     
                     int status = httpConn.getResponseCode();
                     if (status == HttpConnection.HTTP_OK)
@@ -169,8 +170,9 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                         }
                         java.util.Vector messages = parseMessage(raw.toString());
                         processMessages(messages);
+                        input.close();
                     }
-                }
+                    s.close();                }
                 catch (java.io.IOException e) 
                 {
                     System.err.println(e.toString());
@@ -183,18 +185,23 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
 
     private void processMessages(java.util.Vector messages)
     {
-        if (messages.size() < 2)
+        if (messages.size() < 1)
             return;
         
         String typeMessage = (String)messages.elementAt(0);
         if (typeMessage.equals("CODIGO"))
         {
+            if (messages.size() < 2)
+                return;
+                
             IpokiPlugin._idUser = (String)messages.elementAt(1);
+            _app._statusThread.pause();
             _app.invokeLater(new Runnable() 
             {
                 public void run()
                 {
                     _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_CONNECTED));                
+                    _app.popScreen(_app._gaugeScreen);
                 }
             });    
         }
@@ -205,20 +212,23 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                 
             IpokiPlugin._comment = (String)messages.elementAt(1) + ": " + (String)messages.elementAt(2);
         }
+        
         if (_urlType == SIGNOUT_S && typeMessage.equals("OK"))
         {
+            _app._statusThread.pause();
             _app.invokeLater(new Runnable() 
             {
                 public void run()
                 {
-                    _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_CONNECTED));
+                    _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_DISCONNECTED));
+                    _app.popScreen(_app._gaugeScreen);
                 }
             });    
         }
     }
 
     public void stop()
-    {
+    { 
         _stop = true;
     }
     
@@ -236,6 +246,9 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
             // Eliminamos lo ya añadido (incluído el $$$)
             mensaje = mensaje.substring(mensaje.indexOf("$$$") + 3);
         }
+        
+        if (mensaje.length() > 0)
+            mensajes.addElement(mensaje);
             
         return mensajes;
     }
