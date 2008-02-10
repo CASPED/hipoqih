@@ -57,8 +57,6 @@ public class ListenThread extends Thread
     
     public void run()
     {
-        int i = 0;
-        
         // main loop
         for(;;)
         {
@@ -81,7 +79,6 @@ public class ListenThread extends Thread
                 return;
             }
             
-            i=0;
             // Loop until stopped or paused
             for(;;)
             {
@@ -90,6 +87,17 @@ public class ListenThread extends Thread
                     return;
                 }
                 
+                // pause() was called
+                if (!_running)
+                {
+                    _isPaused = true;
+                    synchronized(this)
+                    {
+                        // Wake up waiting thread
+                        this.notify();
+                    }
+                    break;
+                }
                 _app._connectionThread.ear(IpokiPlugin._idUser, _app._lblLatitude.getText(), _app._lblLongitude.getText(), "");
 
                 try 

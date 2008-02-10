@@ -4,6 +4,8 @@ AlwaysBuild=1
 [AlxImports
 ]
 AutoRestart=0
+[BuildOnlyFiles
+]
 [ClassProtection
 ]
 [CustomBuildFiles
@@ -21,6 +23,7 @@ ExcludeFromBuildAll=0
 ConnectionThread.java
 IpokiMainScreen.java
 IpokiPlugin.java
+ipokito.png
 ListenThread.java
 resource\IpokiPlugin.rrc
 resource\IpokiPlugin.rrh
@@ -31,12 +34,14 @@ HaveAlxImports=0
 HaveDefs=0
 HaveImports=0
 [Icons
+ipokito.png
 ]
 [ImplicitRules
 ]
 [Imports
 ]
 Listing=0
+NoImport=0
 Options=-quiet
 OutputFileName=IpokiPlugin
 [PackageProtection

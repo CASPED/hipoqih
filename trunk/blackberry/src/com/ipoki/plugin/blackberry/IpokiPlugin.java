@@ -140,6 +140,13 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         private MenuItem _save = new MenuItem(IpokiPlugin._resources, MNU_SAVE, 200000, 10) {
             public void run()
             {   
+                invokeLater(new Runnable() 
+                {
+                    public void run()
+                    {
+                        _lblUser.setText(_userEdit.getText());
+                    }
+                });    
                 IpokiPlugin.saveOptions(_userEdit.getText(), _passEdit.getText(), _freqEdit.getText());
                 IpokiPlugin.this.popScreen(SetupScreen.this);
             }
@@ -172,6 +179,10 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         _mainScreen = new IpokiMainScreen();
         _label = new LabelField("");
         _mainScreen.add(_label);
+        _gaugeScreen = new PopupScreen(new VerticalFieldManager());
+        _gauge = new GaugeField("", 0, 9, 0, GaugeField.LABEL_AS_PROGRESS);
+        _gaugeScreen.add(_gauge);
+
         
         //start the helper threads
         _statusThread.start();
@@ -189,6 +200,15 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         if (startLocationUpdate())
         {
         }
+    }
+    
+    public void showAbout()
+    {
+        Bitmap bitmap = Bitmap.getBitmapResource("ipokito.png");
+        Dialog about = new Dialog(Dialog.D_OK, "Ipoki Plugin for BlackBerry", 0, bitmap, 0);
+        LabelField text1 = new LabelField("Ipoki Technologies S.L.");
+        about.add(text1);
+        pushScreen(about);
     }
     
     private boolean startLocationUpdate()
@@ -270,19 +290,43 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
     
     public void connect()
     {
-        _gaugeScreen = new PopupScreen(new VerticalFieldManager());
-        _gauge = new GaugeField("Connecting...", 0, 9, 0, GaugeField.LABEL_AS_PROGRESS);
-        _gaugeScreen.add(_gauge);
+        _gauge.setValue(0);
         _connectionThread.signIn(_user, _pass);
-        //_statusThread.go();
+        _statusThread.go();
         _listenThread.go();
-        //pushScreen(_gaugeScreen);
+        pushScreen(_gaugeScreen);
     }
     
     public void disconnect()
     {
         if (!_idUser.equals(""))
+        {
+            _gauge.setValue(0);
+            _statusThread.go();
+            pushScreen(_gaugeScreen);
+            pauseListenThread();
             _connectionThread.signout(_idUser);
+        }
+    }
+    
+    public void pauseListenThread()
+    {
+        _listenThread.pause();
+        try 
+        {
+            synchronized(_listenThread)
+            {
+                //Check the paused condition, incase the notify fires prior to our wait, in which case we may never see that nofity
+                while ( !_listenThread.isPaused() )
+                {
+                    _listenThread.wait();
+                }
+            }
+        } 
+        catch (InterruptedException e) 
+        {
+            System.err.println(e.toString());
+        }
     }
     
     public void updateGauge(final int i)
