@@ -234,7 +234,8 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
                     }
                 };
                 invokeLater( showGpsUnsupportedDialog );  // ask event-dispatcher thread to display dialog ASAP
-            } else 
+            } 
+            else 
             {
                 // only a single listener can be associated with a provider, and unsetting it involves the same
                 // call but with null, therefore, no need to cache the listener instance
@@ -293,7 +294,6 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         _gauge.setValue(0);
         _connectionThread.signIn(_user, _pass);
         _statusThread.go();
-        _listenThread.go();
         pushScreen(_gaugeScreen);
     }
     

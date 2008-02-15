@@ -191,17 +191,36 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         String typeMessage = (String)messages.elementAt(0);
         if (typeMessage.equals("CODIGO"))
         {
-            if (messages.size() < 2)
-                return;
-                
-            IpokiPlugin._idUser = (String)messages.elementAt(1);
             _app._statusThread.pause();
             _app.invokeLater(new Runnable() 
             {
                 public void run()
                 {
-                    _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_CONNECTED));                
                     _app.popScreen(_app._gaugeScreen);
+                }
+            });    
+
+            String message = (String)messages.elementAt(1);
+            if (message.equals("ERROR") )
+            {
+                _app.invokeLater(new Runnable() 
+                {
+                    public void run()
+                    {
+                        Dialog.alert(IpokiPlugin._resources.getString(LBL_LOGIN_ERROR));
+                    }
+                });    
+                return;
+            }
+                
+            IpokiPlugin._idUser = (String)messages.elementAt(1);
+            _app._listenThread.go();
+
+            _app.invokeLater(new Runnable() 
+            {
+                public void run()
+                {
+                    _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_CONNECTED));                
                 }
             });    
         }
