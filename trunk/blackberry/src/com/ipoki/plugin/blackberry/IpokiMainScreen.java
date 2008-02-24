@@ -61,6 +61,18 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
         newFont = font.derive(Font.BOLD);
         _app._lblLatitude.setFont(newFont);
         add(_app._lblLatitude);
+
+        LabelField lblTextCommentSent = new LabelField(_resources.getString(LBL_MESSAGE_RECEIVED));
+        font = lblTextCommentSent.getFont();
+        newFont = font.derive(Font.ITALIC);
+        lblTextCommentSent.setFont(newFont);
+        add(lblTextCommentSent);
+        
+        _app._lblCommentSent = new LabelField("");
+        font = _app._lblCommentSent.getFont();
+        newFont = font.derive(Font.BOLD);
+        _app._lblCommentSent.setFont(newFont);
+        add(_app._lblCommentSent);
     }
     
     public void makeMenu(Menu menu, int instance)
@@ -68,6 +80,7 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
         menu.add(invokeConnect);
         menu.add(invokeDisconnect);
         menu.addSeparator();
+        menu.add(invokeSendMessage);
         //menu.add(invokeMap);
         //menu.add(invokeFriends);
         //menu.addSeparator();
@@ -92,6 +105,14 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
         public void run()
         {
             _app.disconnect();
+        }        
+    };    
+
+    MenuItem invokeSendMessage  = new MenuItem(_resources.getString(MNU_MESSAGE),0,0)
+    {
+        public void run()
+        {
+            _app.sendMessage();
         }        
     };    
 

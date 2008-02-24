@@ -21,6 +21,7 @@
 // 0x90b4a6286eb92c20L
 package com.ipoki.plugin.blackberry;
 
+import javax.microedition.io.*;
 import javax.microedition.rms.*;
 import javax.microedition.location.*;
 import net.rim.device.api.ui.*;
@@ -33,20 +34,24 @@ import com.ipoki.plugin.blackberry.resource.*;
 
 public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
 {
-    private IpokiMainScreen _mainScreen;
-    private static int _interval = 1; //seconds - this is the period of position query
+    IpokiMainScreen _mainScreen;
 
     PopupScreen _gaugeScreen;
     GaugeField _gauge;
     LabelField _label;
-    private LocationProvider _locationProvider;    
+    LocationProvider _locationProvider;    
+    String _lastMessageSent = "";
+    String _messageToSend = "";
+    int _zoom = 14;
 
 
     LabelField _lblStatus;
     LabelField _lblUser;
     LabelField _lblLongitude;
     LabelField _lblLatitude;
+    LabelField _lblCommentSent;
     
+    static int _interval = 1; //seconds - this is the period of position query
     static ResourceBundle _resources = ResourceBundle.getBundle(BUNDLE_ID, BUNDLE_NAME);
     static PersistentObject _userStore;
     static PersistentObject _passStore;
@@ -83,6 +88,12 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         pushScreen(setupScreen);
     }
     
+    public void sendMessage()
+    {
+        MessageScreen messageScreen = new MessageScreen(_lastMessageSent);
+        pushScreen(messageScreen);
+    }
+    
     static void saveOptions(String user, String pass, String freq)
     {
         synchronized(_userStore)
@@ -105,6 +116,56 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         }
     }
     
+    private class MessageScreen extends MainScreen
+    {
+        private LabelField _messageLabel;
+        private EditField _messageEdit;
+        private LabelField _lastLabel;
+        private LabelField _lastMessageLabel;
+        
+        public MessageScreen(String last) 
+        {    
+            _messageLabel = new LabelField(IpokiPlugin._resources.getString(LBL_MESSAGE), DrawStyle.ELLIPSIS);
+            Font font = _messageLabel.getFont();
+            Font newFont = font.derive(Font.BOLD);
+            _messageLabel.setFont(newFont);
+            add(_messageLabel);
+            _messageEdit = new EditField("", "", 144, Field.EDITABLE);
+            add(_messageEdit);
+            _lastLabel = new LabelField(IpokiPlugin._resources.getString(LBL_LAST_MESSAGE), DrawStyle.ELLIPSIS);
+            font = _lastLabel.getFont();
+            newFont = font.derive(Font.BOLD);
+            _lastLabel.setFont(newFont);
+            add(_lastLabel);
+            _lastMessageLabel = new LabelField(last, DrawStyle.ELLIPSIS);
+            add(_lastMessageLabel);
+        }
+        
+        private MenuItem _cancel = new MenuItem(IpokiPlugin._resources, MNU_CANCEL,  300000, 10) {
+            public void run()
+            {
+                 MessageScreen.this.close();
+            }
+        };  
+        
+        private MenuItem _send = new MenuItem(IpokiPlugin._resources, MNU_SEND, 200000, 10) {
+            public void run()
+            {   
+                _messageToSend = _messageEdit.getText();
+                MessageScreen.this.close();
+            }
+        };
+        
+        protected void makeMenu( Menu menu, int instance )
+        {
+            menu.add(_send);
+            menu.add(_cancel);
+            
+            super.makeMenu(menu, instance);
+        }
+
+    }
+
     private class SetupScreen extends MainScreen
     {
         private LabelField _userLabel;
@@ -273,7 +334,6 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
   
         public void providerStateChanged(LocationProvider provider, int newState)
         {
-            //no-op
         }        
     }
     
