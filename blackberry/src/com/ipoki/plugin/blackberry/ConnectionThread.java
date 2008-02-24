@@ -84,7 +84,16 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                 else
                 {
                     _start = true;
-                    _theUrl = EAR + "?iduser=" + idUser + "&lat=" + lat + "&lon=" + lon + "&comment=" + comment;
+                    _theUrl = EAR + "?iduser=" + idUser + "&lat=" + lat + "&lon=" + lon;
+                    synchronized(_app)
+                    {
+                        if (_app._messageToSend.length() > 0)
+                        {
+                            _theUrl += "&comment=" + _app._messageToSend.replace(' ', '+');
+                            _app._lastMessageSent = _app._messageToSend;
+                            _app._messageToSend = "";
+                        }
+                    }
                     _urlType = EAR_S;
                 }
             }
@@ -172,7 +181,8 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                         processMessages(messages);
                         input.close();
                     }
-                    s.close();                }
+                    s.close();                
+                }
                 catch (java.io.IOException e) 
                 {
                     System.err.println(e.toString());
@@ -183,7 +193,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         } // for
     } // run
 
-    private void processMessages(java.util.Vector messages)
+    private void processMessages(final java.util.Vector messages)
     {
         if (messages.size() < 1)
             return;
@@ -229,7 +239,13 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
             if (messages.size() < 3)
                 return;
                 
-            IpokiPlugin._comment = (String)messages.elementAt(1) + ": " + (String)messages.elementAt(2);
+            _app.invokeLater(new Runnable() 
+            {
+                public void run()
+                {
+                    _app._lblCommentSent.setText((String)messages.elementAt(1) + ": " + (String)messages.elementAt(2));
+                }
+            });    
         }
         
         if (_urlType == SIGNOUT_S && typeMessage.equals("OK"))
