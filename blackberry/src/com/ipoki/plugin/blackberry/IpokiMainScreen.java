@@ -81,7 +81,7 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
         menu.add(invokeDisconnect);
         menu.addSeparator();
         menu.add(invokeSendMessage);
-        //menu.add(invokeMap);
+        menu.add(invokeMap);
         //menu.add(invokeFriends);
         //menu.addSeparator();
         //menu.add(invokePositionLog);
@@ -120,6 +120,8 @@ final class IpokiMainScreen extends MainScreen implements IpokiPluginResource
     {
         public void run()
         {
+            if (IpokiPlugin._isConnected)
+                _app.showMap();
         }        
     };    
 

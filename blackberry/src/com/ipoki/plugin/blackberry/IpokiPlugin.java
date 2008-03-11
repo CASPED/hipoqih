@@ -21,15 +21,21 @@
 // 0x90b4a6286eb92c20L
 package com.ipoki.plugin.blackberry;
 
+import org.xml.sax.*;
+import org.w3c.dom.*;
+import java.io.*;
 import javax.microedition.io.*;
 import javax.microedition.rms.*;
 import javax.microedition.location.*;
 import net.rim.device.api.ui.*;
+import net.rim.device.api.system.*;
 import net.rim.device.api.ui.container.*;
 import net.rim.device.api.ui.component.*;
 import net.rim.device.api.i18n.*;
 import net.rim.device.api.system.*;
 import net.rim.device.api.ui.text.*;
+import net.rim.device.api.xml.parsers.*;
+import net.rim.device.api.util.*;
 import com.ipoki.plugin.blackberry.resource.*;
 
 public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
@@ -42,7 +48,6 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
     LocationProvider _locationProvider;    
     String _lastMessageSent = "";
     String _messageToSend = "";
-    int _zoom = 14;
 
 
     LabelField _lblStatus;
@@ -61,6 +66,7 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
     static String _user;
     static String _pass;
     static int _freq;
+    static boolean _isConnected = false;
     
     static 
     {
@@ -114,6 +120,158 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
             _freqStore.commit();
             _freq = Integer.parseInt(freq);
         }
+    }
+    
+    private class MapScreen extends MainScreen
+    {
+        private int _zoom = 3;
+        private String _latitude;
+        private String _longitude;
+        private String _width;
+        private String _height;
+        private BitmapField _mapField;
+        
+        public MapScreen(String latitude, String longitude) 
+        {
+            _latitude = latitude.substring(0, 6);
+            _longitude = longitude.substring(0, 6);
+            
+            _width = Integer.toString(Graphics.getScreenWidth());
+            _height = Integer.toString(Graphics.getScreenHeight());
+            _mapField = new BitmapField();
+            add(_mapField);
+
+            invokeLater(new Runnable() 
+            {
+                public void run()
+                {
+                    showMap();
+                }
+            });
+        }
+        
+        private void showMap()
+        {
+            StreamConnection s = null;
+            try
+            {
+                String url = getUrl(_latitude, _longitude, _width, _height, Integer.toString(_zoom));
+                s = (StreamConnection)Connector.open(url);
+                HttpConnection httpConn = (HttpConnection)s;
+                httpConn.setRequestProperty("User-Agent", "IpokiPlugin/BlackBerry/0.1");
+                
+                int status = httpConn.getResponseCode();
+                if (status == HttpConnection.HTTP_OK)
+                {
+                    try
+                    {
+                        DocumentBuilder doc = DocumentBuilderFactory.newInstance().newDocumentBuilder(); 
+                        DataInputStream dis = s.openDataInputStream();
+                        Document d = doc.parse(dis);
+                        Element el = d.getDocumentElement();
+                        url = el.getFirstChild().getNodeValue() + ";deviceside=true";
+                        dis.close();
+                    }
+                    catch(SAXException e)
+                    {
+                        System.err.println(e.toString());
+                    }
+                    catch(ParserConfigurationException e)
+                    {
+                        System.err.println(e.toString());
+                    }
+                }
+                
+                s = (StreamConnection)Connector.open(url);
+                httpConn = (HttpConnection)s;
+                httpConn.setRequestProperty("User-Agent", "IpokiPlugin/BlackBerry/0.1");
+                
+                status = httpConn.getResponseCode();
+                if (status == HttpConnection.HTTP_OK)
+                {
+                    java.io.InputStream input = s.openInputStream();
+                    byte[] data = new byte[1];
+                    ByteVector bv = new ByteVector();
+                    while ( -1 != input.read(data) )
+                    {
+                        bv.addElement(data[0]);
+                    }
+                    try
+                    {
+                        _mapField.setBitmap(Bitmap.createBitmapFromPNG(bv.getArray(), 0, -1));
+                        this.invalidate();
+                    }
+                    catch(Exception e)
+                    {
+                        System.err.println(e.toString());
+                    }
+                    input.close();
+                }
+                s.close();                
+            }
+            catch (java.io.IOException e) 
+            {
+                System.err.println(e.toString());
+            }
+            catch(Exception e)
+            {
+                System.err.println(e.toString());
+            }
+        }
+        
+        private String getUrl(String latitude, String longitude, String width, String height, String zoom)
+        {
+            String url = "http://local.yahooapis.com/MapsService/V1/mapImage?appid=08REOqLV34HybSt1yvZRY7DcL5hbUGyaFpRP.hsVJve.01qb6KWXP78TmIPi_w--" + 
+                    "&latitude=" + latitude + 
+                    "&longitude=" + longitude + 
+                    "&image_height=" + height + 
+                    "&image_width=" + width + 
+                    "&zoom=" + zoom;
+            return url + ";deviceside=true";
+        }
+        
+        private MenuItem _zoomIn = new MenuItem(IpokiPlugin._resources, MNU_ZOOMIN, 200000, 10) {
+            public void run()
+            {   
+                if (_zoom > 1)
+                {
+                    _zoom --;
+                    invokeLater(new Runnable() 
+                    {
+                        public void run()
+                        {
+                            showMap();
+                        }
+                    });
+                }
+            }
+        };
+        
+        private MenuItem _zoomOut = new MenuItem(IpokiPlugin._resources, MNU_ZOOMOUT, 200000, 10) {
+            public void run()
+            {
+                if (_zoom < 12)
+                {
+                    _zoom ++;
+                    invokeLater(new Runnable() 
+                    {
+                        public void run()
+                        {
+                            showMap();
+                        }
+                    });
+                }   
+            }
+        };
+        
+        protected void makeMenu( Menu menu, int instance )
+        {
+            menu.add(_zoomIn);
+            menu.add(_zoomOut);
+            
+            super.makeMenu(menu, instance);
+        }
+
     }
     
     private class MessageScreen extends MainScreen
@@ -263,6 +421,12 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
         }
     }
     
+    public void showMap()
+    {
+        MapScreen mapScreen = new MapScreen(this._lblLatitude.getText(), this._lblLongitude.getText());
+        pushScreen(mapScreen);
+    }
+    
     public void showAbout()
     {
         Bitmap bitmap = Bitmap.getBitmapResource("ipokito.png");
@@ -351,19 +515,19 @@ public class IpokiPlugin  extends UiApplication implements IpokiPluginResource
     
     public void connect()
     {
-        _gauge.setValue(0);
+        //_gauge.setValue(0);
         _connectionThread.signIn(_user, _pass);
-        _statusThread.go();
-        pushScreen(_gaugeScreen);
+        //_statusThread.go();
+        //pushScreen(_gaugeScreen);
     }
     
     public void disconnect()
     {
         if (!_idUser.equals(""))
         {
-            _gauge.setValue(0);
-            _statusThread.go();
-            pushScreen(_gaugeScreen);
+            //_gauge.setValue(0);
+            //_statusThread.go();
+            //pushScreen(_gaugeScreen);
             pauseListenThread();
             _connectionThread.signout(_idUser);
         }
