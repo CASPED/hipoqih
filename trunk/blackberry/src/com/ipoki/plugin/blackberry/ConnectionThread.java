@@ -43,7 +43,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         
     public synchronized String getUrl()
     {
-        return _theUrl;
+        return _theUrl + ";deviceside=true";
     }
     
     public void signIn(String user, String pass)
@@ -60,6 +60,13 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
             }
             else
             {
+                _app.invokeLater(new Runnable() 
+                {
+                    public void run()
+                    {
+                        _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_CONNECTING));                
+                    }
+                });    
                 _start = true;
                 _theUrl = SIGNIN + "?user=" + user + "&pass=" + pass;
                 _urlType = SIGNIN_S;
@@ -159,7 +166,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
                 try
                 {
                     System.err.println("open conn");
-                    s = (StreamConnection)Connector.open(getUrl());
+                    s = (StreamConnection)Connector.open(getUrl(), Connector.READ, true);
                     HttpConnection httpConn = (HttpConnection)s;
                     httpConn.setRequestProperty("User-Agent", "IpokiPlugin/BlackBerry/0.1");
                     
@@ -201,14 +208,14 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         String typeMessage = (String)messages.elementAt(0);
         if (typeMessage.equals("CODIGO"))
         {
-            _app._statusThread.pause();
-            _app.invokeLater(new Runnable() 
+            //_app._statusThread.pause();
+            /*_app.invokeLater(new Runnable() 
             {
                 public void run()
                 {
                     _app.popScreen(_app._gaugeScreen);
                 }
-            });    
+            });    */
 
             String message = (String)messages.elementAt(1);
             if (message.equals("ERROR") )
@@ -230,6 +237,7 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
             {
                 public void run()
                 {
+                    IpokiPlugin._isConnected = true;
                     _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_CONNECTED));                
                 }
             });    
@@ -250,13 +258,14 @@ public class ConnectionThread extends Thread implements IpokiPluginResource
         
         if (_urlType == SIGNOUT_S && typeMessage.equals("OK"))
         {
-            _app._statusThread.pause();
+            //_app._statusThread.pause();
             _app.invokeLater(new Runnable() 
             {
                 public void run()
                 {
+                    IpokiPlugin._isConnected = false;
                     _app._lblStatus.setText(IpokiPlugin._resources.getString(LBL_DISCONNECTED));
-                    _app.popScreen(_app._gaugeScreen);
+                    //_app.popScreen(_app._gaugeScreen);
                 }
             });    
         }
