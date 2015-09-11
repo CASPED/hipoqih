@@ -1,0 +1,1 @@
+hipoqih is a tool for mobile devices that allows users to publish their location and to obtain useful information related to this location.
